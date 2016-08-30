@@ -1,4 +1,25 @@
 
+/*
+Context options to remember
+
+
+fillStyle:"#fff"
+strokeStyle:"#000"
+font:"16px verdana"
+textAlign:"center|left|right"
+textBaselign:"top|middle|bottom|alphabetic|hanging"
+lineWidth:number
+lineJoin:"round|bevel|miter"
+lineCap:"round|butt|square"
+
+globalAlpha:0-1
+globalCompositeOperation:"source-over|destination-out"
+
+*/
+
+
+
+
 /* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
 function overRide(op,ov) {
    if(!ov) return op;
@@ -52,12 +73,13 @@ function drawLine(ctx,lines,options){
    strokeIt(ctx,options);
 }
 
-
+/* Draw text */
 function drawText(ctx,text,x,y,options){
    ctx = overRide(ctx,options);
    if(o.lineWidth) ctx.strokeText(text,x,y);
    ctx.fillText(text,x,y);
 }
+/* Draw text with a cut out stroke */
 function drawLabel(ctx,text,x,y,options){
    ctx = overRide(ctx,options);
    ctx.globalCompositeOperation = "destination-out";
@@ -66,7 +88,7 @@ function drawLabel(ctx,text,x,y,options){
    ctx.fillText(text,x,y);
 }
 
-
+/* Draw a circle with a cutout circle */
 function drawPulse2(ctx,x,y,oRadius,iRadius,options){
    drawCircle(ctx,x,y,oRadius,options);
    ctx.globalCompositeOperation = "destination-out";
@@ -74,7 +96,7 @@ function drawPulse2(ctx,x,y,oRadius,iRadius,options){
    ctx.globalCompositeOperation = "source-over";
 }
 
-
+/* Draw a pie shape or donut pie shape */
 function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options){
    var startingAngle = degreesToRadians(startangle);
    var arcSize = degreesToRadians(endangle);
@@ -88,12 +110,13 @@ function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,op
    strokeIt(ctx,options);
 }
 
-
+/* draw a series of circle at x y coordinates */
 function drawPoints(ctx,line,radius,options) {
    for(var i in line) {
       drawCircle(ctx,line[i].x,line[i].y,radius,options);
    }
 }
+/* draw a series of lines vertically and horizontally */
 function drawGrid(ctx,rows,cols,x,y,w,h,options) {
    for(var i=0;i<=rows;i++) {
       drawSegment(ctx,x,(h*(i/rows))+y,x+w,(h*(i/rows))+y,options)
