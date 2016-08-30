@@ -2,7 +2,6 @@
 /*
 Context options to remember
 
-
 fillStyle:"#fff"
 strokeStyle:"#000"
 
@@ -49,13 +48,14 @@ function drawRect(ctx,x,y,w,h,options){
    ctx = overRide(ctx,options);
    ctx.fillRect(x,y,w,h);
 }
-/* Draw a rectangle with a random color */
+/* Draw a rectangle with a random color, using the rand helper function */
 function drawRandomRect(ctx,x,y,w,h,options){
-   o = overRide({
-      lineWidth:0,
-      strokeStyle:"black",
-      fillStyle:"rgba("+rand(120,250)+","+rand(120,250)+","+rand(120,250)+","+(options&&options.opacity!==undefined?options.opacity:0.7)+")"
-   },options);
+   ctx.fillStyle = "rgba("+
+      rand(120,250)+","+
+      rand(120,250)+","+
+      rand(120,250)+","+
+      (options&&options.opacity!==undefined?options.opacity:0.7)+
+      ")";
    drawRect(ctx,x,y,w,h,o);
 }
 /* Draw one line segment */
@@ -66,11 +66,11 @@ function drawSegment(ctx,x1,y1,x2,y2,options){
    strokeIt(ctx,options)
 }
 /* Draw an array of line segments, allowing smooth connections */
-function drawLine(ctx,lines,options){
+function drawLine(ctx,line,options){
    ctx.beginPath();
-   ctx.moveTo(lines[0].x,lines[0].y);
-   for(var i=1,l=lines.length; i<l; i++) {
-      ctx.lineTo(lines[i].x,lines[i].y);
+   ctx.moveTo(line[0].x,line[0].y);
+   for(var i=1,l=line.length; i<l; i++) {
+      ctx.lineTo(line[i].x,line[i].y);
    }
    strokeIt(ctx,options);
 }
@@ -91,10 +91,10 @@ function drawLabel(ctx,text,x,y,options){
 }
 
 /* Draw a circle with a cutout circle */
-function drawPulse2(ctx,x,y,oRadius,iRadius,options){
-   drawCircle(ctx,x,y,oRadius,options);
+function drawPulse2(ctx,x,y,outerRadius,innerRadius,options){
+   drawCircle(ctx,x,y,outerRadius,options);
    ctx.globalCompositeOperation = "destination-out";
-   drawCircle(ctx,x,y,iRadius,options);
+   drawCircle(ctx,x,y,innerRadius,options);
    ctx.globalCompositeOperation = "source-over";
 }
 
@@ -127,6 +127,7 @@ function drawGrid(ctx,rows,cols,x,y,w,h,options) {
       drawSegment(ctx,(w*(i/cols))+x,y,(w*(i/cols))+x,y+h,options)
    }
 }
+/* Draw a grid, a line, and a series of points */
 function drawLineGraph(ctx,line,x,y,w,h){
    drawGrid(ctx,3,5,x,y,w,h,{
       strokeStyle:"#ddd",
@@ -149,14 +150,16 @@ function drawLineGraph(ctx,line,x,y,w,h){
 
 
 
-
+/* Helper Functions */
 function degreesToRadians(degrees) {
    return (degrees * Math.PI)/180;
 }
 function getSatellite(start,angle,distance,isX) {
    return start+Math[isX?"cos":"sin"](degreesToRadians(angle))*distance;
 }
-
+function rand(n,x){
+   return Math.round(Math.random()*(x-n))+n;
+}
 
 
 
