@@ -52,20 +52,16 @@ function drawLine(ctx,lines,options){
    strokeIt(ctx,options);
 }
 
+
 function drawText(ctx,text,x,y,options){
-   o = overRide({
-      strokeStyle:"black",
-      lineWidth:0,
-      radius:10,
-      textAlign:"center",
-      font:"16px Verdana"
-   },options);
-
-   ctx = overRide(ctx,o);
-
-   ctx.globalCompositeOperation = "destination-out";
+   ctx = overRide(ctx,options);
    if(o.lineWidth) ctx.strokeText(text,x,y);
-
+   ctx.fillText(text,x,y);
+}
+function drawLabel(ctx,text,x,y,options){
+   ctx = overRide(ctx,options);
+   ctx.globalCompositeOperation = "destination-out";
+   ctx.strokeText(text,x,y);
    ctx.globalCompositeOperation = "source-over";
    ctx.fillText(text,x,y);
 }
