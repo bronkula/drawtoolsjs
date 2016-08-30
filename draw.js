@@ -5,12 +5,14 @@ Context options to remember
 
 fillStyle:"#fff"
 strokeStyle:"#000"
-font:"16px verdana"
-textAlign:"center|left|right"
-textBaselign:"top|middle|bottom|alphabetic|hanging"
+
 lineWidth:number
 lineJoin:"round|bevel|miter"
 lineCap:"round|butt|square"
+
+font:"16px verdana"
+textAlign:"center|left|right"
+textBaselign:"top|middle|bottom|alphabetic|hanging"
 
 globalAlpha:0-1
 globalCompositeOperation:"source-over|destination-out"
