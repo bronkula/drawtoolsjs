@@ -237,7 +237,10 @@ function abs(a) {
 function vxs(x0,y0,x1,y1) {
     return (x0*y1) - (x1*y0);
 }
-
+/* If p(osition) is outside of n or x, return a reversed s(peed) */
+function bounce(p,s,n,x) {
+  return (p>=x||p<=n)?-s:s;
+}
 
 
 
