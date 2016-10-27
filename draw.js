@@ -209,12 +209,21 @@ function drawImageTSR(ctx,img,x,y,w,h,sx,sy,r) {
 /*---------------------- Math Helper Functions -----------------------------*/
 
 /* Turn degrees into Radians, necessary for circle math */
-function degreesToRadians(degrees) {
-   return (degrees * Math.PI)/180;
+function degreesToRadians(num) {
+   return (num * Math.PI)/180;
+}
+/* Turn Radians into Degrees, necessary for circle math */
+function radiansToDegrees(num) {
+   return (num * 180)/Math.PI;
 }
 /* Get a positional offset for x or y useful for placing something on an arc around point */
 function getSatellite(start,angle,distance,isX) {
    return start+Math[isX?"cos":"sin"](degreesToRadians(angle))*distance;
+}
+/* Returns the angle from two points */
+function angleFromPoints(x1,y1,x2,y2,inRadians){
+   var angleRadians = Math.atan2(y2 - y1, x2 - x1);
+   return inRadians?angleRadians:radiansToDegrees(angleRadians);
 }
 /* A random number between n and x */
 function rand(n,x){
