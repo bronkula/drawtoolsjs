@@ -225,6 +225,10 @@ function angleFromPoints(x1,y1,x2,y2,inRadians){
    var angleRadians = Math.atan2(y2 - y1, x2 - x1);
    return inRadians?angleRadians:radiansToDegrees(angleRadians);
 }
+/* Returns a 0,360 degree angle from a -180,180 degree angle */
+function trueAngle(a) {
+  return a<0?360+a:a;
+}
 /* A random number between n and x */
 function rand(n,x){
    return Math.round(Math.random()*(x-n))+n;
