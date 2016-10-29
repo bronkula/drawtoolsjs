@@ -225,6 +225,10 @@ function angleFromPoints(x1,y1,x2,y2,inRadians){
    var angleRadians = Math.atan2(y2 - y1, x2 - x1);
    return inRadians?angleRadians:radiansToDegrees(angleRadians);
 }
+// Will return the angle opposite of the B side
+function angleFromSides(a,b,c) {
+  return Math.acos((c*c+a*a-b*b)/(2*c*a));
+}
 /* Returns a 0,360 degree angle from a -180,180 degree angle */
 function trueAngle(a) {
   return a<0?360+a:a;
