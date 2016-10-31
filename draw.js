@@ -137,7 +137,7 @@ function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,op
 }
 
 // http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
-var drawRoundRect = function(ctx, x, y, w, h, r, options) {
+function drawRoundRect(ctx, x, y, w, h, r, options) {
   if (typeof r === 'undefined') r = 0;
   if (typeof r === 'number') {
     r = {tl: r, tr: r, br: r, bl: r};
