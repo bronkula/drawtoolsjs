@@ -137,23 +137,23 @@ function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,op
 }
 
 // http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
-function drawRoundRect(ctx, x, y, width, height, radius, options) {
-  if (typeof radius === 'undefined') radius = 0;
-  if (typeof radius === 'number') {
-    radius = {tl: radius, tr: radius, br: radius, bl: radius};
+var drawRoundRect = function(ctx, x, y, w, h, r, options) {
+  if (typeof r === 'undefined') r = 0;
+  if (typeof r === 'number') {
+    r = {tl: r, tr: r, br: r, bl: r};
   } else {
-    radius = overRide({tl: 0, tr: 0, br: 0, bl: 0},radius);
+    r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
   }
   ctx.beginPath();
-  ctx.moveTo(x + radius.tl, y);
-  ctx.lineTo(x + width - radius.tr, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-  ctx.lineTo(x + width, y + height - radius.br);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-  ctx.lineTo(x + radius.bl, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-  ctx.lineTo(x, y + radius.tl);
-  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.moveTo(x + r.tl, y);
+  ctx.lineTo(x + w - r.tr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+  ctx.lineTo(x + w, y + h - r.br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+  ctx.lineTo(x + r.bl, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+  ctx.lineTo(x, y + r.tl);
+  ctx.quadraticCurveTo(x, y, x + r.tl, y);
   ctx.closePath();
   strokeIt(ctx,options);
   fillIt(ctx,options);
