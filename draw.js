@@ -1,4 +1,12 @@
 /*
+ * Draw Tools v1.2
+ * Creator: Hamilton Cline
+ * Email: hamdiggy@gmail.com
+ * Website: hamiltondraws.com
+*/
+
+
+/*
 Context options to remember
 
 fillStyle:"#fff"
@@ -18,17 +26,79 @@ globalCompositeOperation:"source-over|destination-out"
 
 
 
-/* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
-function overRide(op,ov) {
-   if(!ov) return op;
-   for(var i in ov) {
-      if(ov.hasOwnProperty(i) === false) continue;
-      op[i] = ov[i];
+
+
+
+
+
+
+
+/*----------------------------------------------------------------------*/
+/*                         Path functions                               */
+
+var pathmaker = {
+   start:function(ctx){
+      ctx.beginPath();
+   },
+   end:function(ctx){
+      ctx.closePath();
+   },
+   points:function(ctx,pts){
+      if(pts.length<2) return false;
+      ctx.moveTo(pts[0].x,pts[0].y);
+      for(var i in pts) {
+         ctx.lineTo(pts[i].x,pts[i].y);
+      }
+   },
+   circle:function(ctx,x,y,r,a1,a2,a3){
+      pathmaker.arc(x,y,r,
+        a1!==undefined?a1:0,
+        a2!==undefined?a2:2*Math.PI,
+        a3!==undefined?a3:undefined);
+   },
+   arc:function(ctx,x,y,r,a1,a2,a3){
+      ctx.arc(x,y,r,a1,a2,a3);
+   },
+   rect:function(ctx,x,y,w,h){
+      pathPoints([
+         {x:x,y:y},
+         {x:x+w,y:y},
+         {x:x+w,y:y+h},
+         {x:x,y:y+h},
+         {x:x,y:y}
+      ]);
+   },
+   pie:function(ctx,x,y,or,ir,sa,ea,ad){
+      sa = degreesToRadians(sa);
+      ea = sa + degreesToRadians(ea);
+      pathmaker.arc(ctx,x,y,or, sa, ea, !ad);
+      pathmaker.arc(ctx,x,y,ir, ea, sa, ad);
+   },
+   roundRect:function(ctx,x,y,w,h,r){
+      if (typeof r === 'undefined') r = 0;
+      if (typeof r === 'number') {
+         r = {tl: r, tr: r, br: r, bl: r};
+      } else {
+         r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
+      }
+      ctx.moveTo(x + r.tl, y);
+      ctx.lineTo(x + w - r.tr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+      ctx.lineTo(x + w, y + h - r.br);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+      ctx.lineTo(x + r.bl, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+      ctx.lineTo(x, y + r.tl);
+      ctx.quadraticCurveTo(x, y, x + r.tl, y);
    }
-   return op;
 }
-
-
+function makePath(ctx,paths) {
+   pathmaker.start(ctx);
+   for(var i in paths) {
+      pathmaker[paths[i][0]].apply(paths[i].splice(0,1,ctx));
+   }
+   pathmaker.end(ctx);
+}
 
 
 /*----------------------------------------------------------------------*/
@@ -54,8 +124,7 @@ function fillIt(ctx,options){
 
 /* Draw a circle */
 function drawCircle(ctx,x,y,r,options){
-   ctx.beginPath();
-   ctx.arc(x,y,r,0,2*Math.PI);
+   makePath(ctx,[["circle",x,y,r]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
@@ -66,7 +135,7 @@ function drawRect(ctx,x,y,w,h,options){
 }
 /* Draw a rectangle with a random color, using the rand helper function */
 function drawRandomRect(ctx,x,y,w,h,options){
-   ctx.fillStyle = "rgba("+
+   o.fillStyle = "rgba("+
       rand(120,250)+","+
       rand(120,250)+","+
       rand(120,250)+","+
@@ -76,18 +145,15 @@ function drawRandomRect(ctx,x,y,w,h,options){
 }
 /* Draw one line segment */
 function drawSegment(ctx,x1,y1,x2,y2,options){
-   ctx.beginPath();
-   ctx.moveTo(x1,y1);
-   ctx.lineTo(x2,y2);
-   strokeIt(ctx,options)
+   makePath(ctx,[["points",[
+      {x:x1,y:y1},
+      {x:x2,y:y2}
+      ]]]);
+   strokeIt(ctx,options);
 }
 /* Draw an array of line segments, allowing smooth connections */
 function drawLine(ctx,line,options){
-   ctx.beginPath();
-   ctx.moveTo(line[0].x,line[0].y);
-   for(var i=1,l=line.length; i<l; i++) {
-      ctx.lineTo(line[i].x,line[i].y);
-   }
+   makePath(ctx,[["points",line]]);
    strokeIt(ctx,options);
    fillIt(ctx,options);
 }
@@ -124,55 +190,46 @@ function drawPulse2(ctx,x,y,outerRadius,innerRadius,options){
 
 /* Draw a pie shape or donut pie shape */
 function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options){
-   var startingAngle = degreesToRadians(startangle);
-   var arcSize = degreesToRadians(endangle);
-   var endingAngle = startingAngle + arcSize;
-
-   ctx.beginPath();
-   ctx.arc(x, y, outerRadius, startingAngle, endingAngle, !additive);
-   ctx.arc(x, y, innerRadius, endingAngle, startingAngle, additive);
-   ctx.closePath();
+   makePath(ctx,[["pie",ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
 
 // http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
 function drawRoundRect(ctx, x, y, w, h, r, options) {
-  if (typeof r === 'undefined') r = 0;
-  if (typeof r === 'number') {
-    r = {tl: r, tr: r, br: r, bl: r};
-  } else {
-    r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + r.tl, y);
-  ctx.lineTo(x + w - r.tr, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
-  ctx.lineTo(x + w, y + h - r.br);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
-  ctx.lineTo(x + r.bl, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
-  ctx.lineTo(x, y + r.tl);
-  ctx.quadraticCurveTo(x, y, x + r.tl, y);
-  ctx.closePath();
-  strokeIt(ctx,options);
-  fillIt(ctx,options);
+   makePath(ctx,[["roundRect",x, y, w, h, r]])
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
 }
 
 /* draw a series of circle at x y coordinates */
 function drawPoints(ctx,line,radius,options) {
+   pathmaker.start(ctx);
    for(var i in line) {
-      drawCircle(ctx,line[i].x,line[i].y,radius,options);
+      pathmaker.circle(ctx,line[i].x,line[i].y,radius);
    }
+   pathmaker.end(ctx);
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
 }
 /* draw a series of lines vertically and horizontally */
 function drawGrid(ctx,rows,cols,x,y,w,h,options) {
+   pathmaker.start(ctx);
    for(var i=0;i<=rows;i++) {
-      drawSegment(ctx,x,(h*(i/rows))+y,x+w,(h*(i/rows))+y,options)
+      pathmaker.points(ctx,[
+         {x:x,y:(h*(i/rows))+y},
+         {x:x+w,y:(h*(i/rows))+y}
+         ]);
    }
    for(var i=0;i<=cols;i++) {
-      drawSegment(ctx,(w*(i/cols))+x,y,(w*(i/cols))+x,y+h,options)
+      pathmaker.points(ctx,[
+         {x:(w*(i/cols))+x,y:y},
+         {x:(w*(i/cols))+x,y:y+h}
+         ]);
    }
+   pathmaker.end(ctx);
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
 }
 /* Draw a grid, a line, and a series of points */
 function drawLineGraph(ctx,line,x,y,w,h){
@@ -281,7 +338,15 @@ function vxs(x0,y0,x1,y1) {
 function bounce(p,s,n,x) {
   return (p>=x||p<=n)?-s:s;
 }
-
+/* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
+function overRide(op,ov) {
+   if(!ov) return op;
+   for(var i in ov) {
+      if(ov.hasOwnProperty(i) === false) continue;
+      op[i] = ov[i];
+   }
+   return op;
+}
 
 
 
@@ -344,6 +409,7 @@ function detectCircleCollission(x1,y1,r1,x2,y2,r2) {
 
 
 /*------------------------------- Point Detection Functions -----------------------*/
+/* These Require jQuery Events */
 /* Determine if an event is a touch event */
 function isTouch(e) {
    return e.type.substring(0,5) == "touch";
@@ -362,14 +428,12 @@ function getEXY(e) {
    var offs = $(e.target).offset();
    x = e.pageX - offs.left;
    y = e.pageY - offs.top;
-   var ratio = ratio==undefined?1:ratio;
+   var ratio = ratio===undefined?1:ratio;
    return new xy(ratio*x,ratio*y);
 }
 /* Return the first xy position from an event, whether touch or click */
 function getEventXY(e){
    return getEXY(ev(e)[0]);
 }
-
-
 
 
