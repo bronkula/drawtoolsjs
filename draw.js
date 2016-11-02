@@ -1,5 +1,5 @@
 /*
- * Draw Tools v1.2
+ * Draw Tools v1.2.1
  * Creator: Hamilton Cline
  * Email: hamdiggy@gmail.com
  * Website: hamiltondraws.com
@@ -51,7 +51,7 @@ var pathmaker = {
       }
    },
    circle:function(ctx,x,y,r,a1,a2,a3){
-      pathmaker.arc(x,y,r,
+      pathmaker.arc(ctx,x,y,r,
         a1!==undefined?a1:0,
         a2!==undefined?a2:2*Math.PI,
         a3!==undefined?a3:undefined);
@@ -94,8 +94,10 @@ var pathmaker = {
 }
 function makePath(ctx,paths) {
    pathmaker.start(ctx);
+   var type;
    for(var i in paths) {
-      pathmaker[paths[i][0]].apply(paths[i].splice(0,1,ctx));
+      type = paths[i].splice(0,1,ctx)[0];
+      pathmaker[type].apply(null,paths[i]);
    }
    pathmaker.end(ctx);
 }
@@ -190,7 +192,7 @@ function drawPulse2(ctx,x,y,outerRadius,innerRadius,options){
 
 /* Draw a pie shape or donut pie shape */
 function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options){
-   makePath(ctx,[["pie",ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
+   makePath(ctx,[["pie",x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
