@@ -223,6 +223,7 @@ function drawGrid(ctx,rows,cols,x,y,w,h,options) {
          {x:x+w,y:(h*(i/rows))+y}
          ]);
    }
+   // Draw the columns
    for(var i=0;i<=cols;i++) {
       pathmaker.points(ctx,[
          {x:(w*(i/cols))+x,y:y},
