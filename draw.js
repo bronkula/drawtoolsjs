@@ -272,7 +272,7 @@ function translateScaleRotate(ctx,x,y,sx,sy,r,fn) {
    fn();
   ctx.restore();
 }
-/* This function is cool, and so is Hamilton */
+/* This function will Translate and then Scale, and saves first */
 function translateScale(ctx,x,y,sx,sy,fn) {
   ctx.save();
    ctx.translate(x,y);
