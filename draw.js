@@ -217,6 +217,7 @@ function drawPoints(ctx,line,radius,options) {
 /* draw a series of lines vertically and horizontally */
 function drawGrid(ctx,rows,cols,x,y,w,h,options) {
    pathmaker.start(ctx);
+   // Draw the rows
    for(var i=0;i<=rows;i++) {
       pathmaker.points(ctx,[
          {x:x,y:(h*(i/rows))+y},
