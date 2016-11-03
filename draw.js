@@ -263,7 +263,7 @@ function rotateAndDo ( ctx, angleInRad , positionX, positionY, callback) {
    ctx.rotate( -angleInRad );
    ctx.translate( -positionX, -positionY );
 }
-
+/* This function does three operations, and saves first */
 function translateScaleRotate(ctx,x,y,sx,sy,r,fn) {
   ctx.save();
    ctx.translate(x,y);
