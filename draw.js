@@ -183,7 +183,7 @@ function drawLabel(ctx,text,x,y,options){
 }
 
 /* Draw a circle with a cutout circle */
-function drawPulse2(ctx,x,y,outerRadius,innerRadius,options){
+function drawPulse(ctx,x,y,outerRadius,innerRadius,options){
    drawCircle(ctx,x,y,outerRadius,options);
    ctx.globalCompositeOperation = "destination-out";
    drawCircle(ctx,x,y,innerRadius,options);
@@ -304,6 +304,13 @@ function radiansToDegrees(num) {
 /* Get a positional offset for x or y useful for placing something on an arc around point */
 function getSatellite(start,angle,distance,isX) {
    return start+Math[isX?"cos":"sin"](degreesToRadians(angle))*distance;
+}
+/* Expects an XY object, an angle, and a distance. Returns an XY object */
+function getSatelliteXY(pos,angle,distance) {
+   return {
+      x:getSatellite(pos.x,angle,distance,true),
+      y:getSatellite(pos.y,angle,distance,false)
+   };
 }
 /* Returns the angle from two points */
 function angleFromPoints(x1,y1,x2,y2,inRadians){
