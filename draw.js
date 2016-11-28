@@ -137,13 +137,13 @@ function drawRect(ctx,x,y,w,h,options){
 }
 /* Draw a rectangle with a random color, using the rand helper function */
 function drawRandomRect(ctx,x,y,w,h,options){
-   o.fillStyle = "rgba("+
+   options.fillStyle = "rgba("+
       rand(120,250)+","+
       rand(120,250)+","+
       rand(120,250)+","+
       (options&&options.opacity!==undefined?options.opacity:0.7)+
       ")";
-   drawRect(ctx,x,y,w,h,o);
+   drawRect(ctx,x,y,w,h,options);
 }
 /* Draw one line segment */
 function drawSegment(ctx,x1,y1,x2,y2,options){
