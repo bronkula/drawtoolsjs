@@ -4,7 +4,7 @@ Created by Hamilton Cline
 
 [Draw.js](./README.md#user-content-draw-tools) is a canvas library for javascript. I will almost certainly write something in depth here. For now, there's a file. It's got some functions. Most of them should be relatively clear how to use.
 
-[Color.js](./README.md#user-content-color) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
+[Color.js](./README.md#user-content-color-tools) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
 
 
 ## Draw Tools
