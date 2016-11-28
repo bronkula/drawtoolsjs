@@ -59,11 +59,6 @@ cvs.on("mousedown touchstart",function(e){
   drawCircle(ctx,pos.x,pos.y,25,{fillStyle:"blue"});
 });
 </script>
-```
-
-Ok, obviously, there's so much more. Explore a bit, and see if you can figure anything out. If you'd like to improve or help me with this project, please fork and do some goodness.
-
-
 
 ## Color Tools
 
@@ -91,3 +86,10 @@ Output strings can be generated for all the color object types using the toStrin
 var c = new COLOR("rgb",{r:255,g:0,b:0});
 console.log(c.toString("hsl")); // returns `hsl(0,100%,50%)`
 ```
+
+
+
+
+Ok, obviously, there's so much more. Explore a bit, and see if you can figure anything out. If you'd like to improve or help me with this project, please fork and do some goodness.
+
+
