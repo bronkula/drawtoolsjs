@@ -351,13 +351,13 @@ function bounce(p,s,n,x) {
   return (p>=x||p<=n)?-s:s;
 }
 /* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
-function overRide(op,ov) {
-   if(!ov) return op;
-   for(var i in ov) {
-      if(ov.hasOwnProperty(i) === false) continue;
-      op[i] = ov[i];
+function overRide(o1,o2) {
+   if(!o2) return o1;
+   for(var i in o2) {
+      if(o2.hasOwnProperty(i) === false) continue;
+      o1[i] = o2[i];
    }
-   return op;
+   return o1;
 }
 
 
