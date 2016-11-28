@@ -17,7 +17,6 @@ function hexToRgb(h) {
         b:parseInt(h.substr(4,2),16)};
 }
 
-/* https://gist.github.com/mjijackson/5311256 */
 function hslToRgb(h, s, l){
     if(s===undefined) {
         var s = h.s;
@@ -37,7 +36,7 @@ function hslToRgb(h, s, l){
         b = hue2rgb(p, q, h - 1/3);
     }
 
-    return {r:Math.round(r * 255), g:Math.round(g * 255), b:Math.round(b * 255)};
+    return {r:r * 255, g:g * 255, b:b * 255};
 }
 function hue2rgb(p, q, t){
     if(t < 0) t += 1;
@@ -137,22 +136,18 @@ function cmykToRgb(c,m,y,k){
         var k = c.k;
         var c = c.c;
     }
-    var result = {r:0,g:0,b:0};
+    var r=0,g=0,b=0;
 
     c = c / 100;
     m = m / 100;
     y = y / 100;
     k = k / 100;
 
-    result.r = 1 - Math.min( 1, c * ( 1 - k ) + k );
-    result.g = 1 - Math.min( 1, m * ( 1 - k ) + k );
-    result.b = 1 - Math.min( 1, y * ( 1 - k ) + k );
+    r = 1 - Math.min( 1, c * ( 1 - k ) + k );
+    g = 1 - Math.min( 1, m * ( 1 - k ) + k );
+    b = 1 - Math.min( 1, y * ( 1 - k ) + k );
 
-    result.r = Math.round( result.r * 255 );
-    result.g = Math.round( result.g * 255 );
-    result.b = Math.round( result.b * 255 );
-
-    return result;
+    return {r:r*255,g:g*255,b:b*255};
 }
 
 function rgbToCmyk(r,g,b){
@@ -161,23 +156,18 @@ function rgbToCmyk(r,g,b){
         var b = r.b;
         var r = r.r;
     }
-    var result = {c:0,m:0,y:0,k:0};
+    var c=0,m=0,y=0,k=0;
 
     r = r / 255;
     g = g / 255;
     b = b / 255;
 
-    result.k = Math.min( 1 - r, 1 - g, 1 - b );
-    result.c = ( 1 - r - result.k ) / ( 1 - result.k );
-    result.m = ( 1 - g - result.k ) / ( 1 - result.k );
-    result.y = ( 1 - b - result.k ) / ( 1 - result.k );
+    k = Math.min( 1 - r, 1 - g, 1 - b );
+    c = ( 1 - r - k ) / ( 1 - k );
+    m = ( 1 - g - k ) / ( 1 - k );
+    y = ( 1 - b - k ) / ( 1 - k );
 
-    result.c = Math.round( result.c * 100 );
-    result.m = Math.round( result.m * 100 );
-    result.y = Math.round( result.y * 100 );
-    result.k = Math.round( result.k * 100 );
-
-    return result;
+    return {c:c*100,m:m*100,y:y*100,k:k*100};
 }
 
 
@@ -191,11 +181,6 @@ function HSL(h,s,l) {
     this.s = +s;
     this.l = +l;
 }
-function HSV(h,s,v) {
-    this.h = +h;
-    this.s = +s;
-    this.v = +v;
-}
 function CMYK(c,m,y,k) {
     this.c = +c;
     this.m = +m;
@@ -205,7 +190,6 @@ function CMYK(c,m,y,k) {
 function COLOR(t,o) {
     this.rgb = new RGB(0,0,0);
     this.hsl = new HSL(0,0,0);
-    this.hsv = new HSV(0,0,0);
     this.cmyk = new CMYK(0,0,0,0);
     this.hex = 0;
     if(t!==undefined) {
@@ -241,9 +225,6 @@ function COLOR(t,o) {
             case "hsl":
                 this.ov(this.hsl,v);
                 break;
-            case "hsv":
-                this.ov(this.hsv,v);
-                break;
             case "c":
             case "m":
             case "y":
@@ -263,29 +244,22 @@ function COLOR(t,o) {
     COLOR.prototype.updateVals = function(k){
         switch(k) {
             case "rgb":
-                this.rgbToHsl().rgbToHsv().rgbToCmyk().rgbToHex();
+                this.rgbToHsl().rgbToCmyk().rgbToHex();
                 break;
             case "hsl":
-                this.hslToRgb().rgbToHsv().rgbToCmyk().rgbToHex();
-                break;
-            case "hsv":
-                this.hsvToRgb().rgbToHsl().rgbToCmyk().rgbToHex();
+                this.hslToRgb().rgbToCmyk().rgbToHex();
                 break;
             case "cmyk":
-                this.cmykToRgb().rgbToHsl().rgbToHsv().rgbToHex();
+                this.cmykToRgb().rgbToHsl().rgbToHex();
                 break;
             case "hex":
-                this.hexToRgb().rgbToHsl().rgbToHsv().rgbToCmyk();
+                this.hexToRgb().rgbToHsl().rgbToCmyk();
                 break;
         }
         return this;
     }
     COLOR.prototype.rgbToHsl = function() {
         this.ov(this.hsl,rgbToHsl(this.rgb));
-        return this;
-    };
-    COLOR.prototype.rgbToHsv = function() {
-        this.ov(this.hsv,rgbToHsv(this.rgb));
         return this;
     };
     COLOR.prototype.rgbToCmyk = function() {
@@ -298,10 +272,6 @@ function COLOR(t,o) {
     };
     COLOR.prototype.hslToRgb = function() {
         this.ov(this.rgb,hslToRgb(this.hsl));
-        return this;
-    };
-    COLOR.prototype.hsvToRgb = function() {
-        this.ov(this.rgb,hslToRgb(this.hsv));
         return this;
     };
     COLOR.prototype.cmykToRgb = function() {
