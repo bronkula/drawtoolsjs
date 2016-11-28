@@ -59,6 +59,7 @@ cvs.on("mousedown touchstart",function(e){
   drawCircle(ctx,pos.x,pos.y,25,{fillStyle:"blue"});
 });
 </script>
+```
 
 ## Color Tools
 
