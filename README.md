@@ -32,7 +32,7 @@ There we go. Now what? Let's actually use the library. Let's draw a circle.
 ```html
 <canvas width="400" height="400"></canvas>
 
-<script src="drawtools.js"></script>
+<script src="draw.js"></script>
 <script>
 var cvs = document.querySelector("canvas");
 var ctx = cvs.getContext("2d");
