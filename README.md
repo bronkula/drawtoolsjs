@@ -2,7 +2,7 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use. However it adds some standardization for path drawing, as well as event handling. 
+[Draw.js](#user-content-draw-tools) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use. However it adds some standardization for path drawing, as well as event handling.  
 Dependencies - **jQuery** - For event detection
 
 [Color.js](#user-content-color-tools) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
