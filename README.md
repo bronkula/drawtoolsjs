@@ -2,16 +2,16 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools) is a canvas library for javascript. I will almost certainly write something in depth here. For now, there's a file. It's got some functions. Most of them should be relatively clear how to use.
+[Draw.js](#user-content-draw-tools) is a canvas library for javascript. I will almost certainly write something in depth here. For now, there's a file. It's got some functions. Most of them should be relatively clear how to use.  
+Dependencies - **jQuery** - For event detection
 
 [Color.js](#user-content-color-tools) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
 
 
 ## Draw Tools
-Many of the actual drawing tools in this library, as opposed to the positional tools, Use the same methodology for arguments. A context to be applied, some values necessary for the particular shape, and then an options object. This object should be all the relevant context options for drawing, such as colors and line widths.
+Many of the actual drawing tools in the draw.js library (as opposed to the positional tools) use similar methodologies for arguments. They use a context to be applied, some values necessary for the particular shape, and then an options object. This object should be all the relevant context options for drawing, such as colors and line widths, that would normally be applied to a canvas context.
 
-## Where to Start?
-Well, it helps to come at this with a cursory understanding of the html5 canvas already. Much of this library is simplifying certain overly complex common operations when using the canvas.
+So, where to start? Well, it helps to come at this with a cursory understanding of the html5 canvas already. Much of this library is simplifying certain overly complex common operations when using the canvas.
 
 but.
 
