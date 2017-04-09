@@ -441,7 +441,7 @@ function getEXY(e) {
    x = e.pageX - offs.left;
    y = e.pageY - offs.top;
    var ratio = ratio===undefined?1:ratio;
-   return new xy(ratio*x,ratio*y);
+   return {x:ratio*x,y:ratio*y};
 }
 /* Return the first xy position from an event, whether touch or click */
 function getEventXY(e){
