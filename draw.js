@@ -1,5 +1,5 @@
 /*
- * Draw Tools v1.2.1
+ * Draw Tools v1.2.2
  * Creator: Hamilton Cline
  * Email: hamdiggy@gmail.com
  * Website: hamiltondraws.com
@@ -436,16 +436,17 @@ function ev(e){
    }
 }
 /* return an offset xy object for the position of the click or touch in the object */
-function getEXY(e) {
-   var offs = $(e.target).offset();
+/* pass in an optional object that will be used for basis */
+function getEXY(e,o) {
+   var offs = $(o||e.target).offset();
    x = e.pageX - offs.left;
    y = e.pageY - offs.top;
    var ratio = ratio===undefined?1:ratio;
    return {x:ratio*x,y:ratio*y};
 }
 /* Return the first xy position from an event, whether touch or click */
-function getEventXY(e){
-   return getEXY(ev(e)[0]);
+function getEventXY(e,o){
+   return getEXY(ev(e)[0],o);
 }
 
 
