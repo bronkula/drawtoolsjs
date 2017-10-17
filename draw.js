@@ -360,8 +360,13 @@ function overRide(o1,o2) {
    return o1;
 }
 /* This function returns a number from one range transposed into another range */
+/* eg: rangeRatio(5,1,7,35,72) would result in 59.66. 5 inside of 1-7 is equal to 59.66 inside of 35-72. */
 function rangeRatio(n,nmin,nmax,omin,omax) {
    return (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
+}
+/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
+function simpleRatio(nmin,nmax,omax) {
+   return nmin/nmax*omax;
 }
 
 
