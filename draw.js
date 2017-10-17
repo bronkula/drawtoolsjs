@@ -359,6 +359,10 @@ function overRide(o1,o2) {
    }
    return o1;
 }
+/* This function returns a number from one range transposed into another range */
+function rangeRatio(n,nmin,nmax,omin,omax) {
+   return (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
+}
 
 
 
