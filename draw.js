@@ -159,6 +159,17 @@ function drawLine(ctx,line,options){
    strokeIt(ctx,options);
    fillIt(ctx,options);
 }
+/* Draw a shape with any number of sides */
+function drawShape(ctx,x,y,r,a,s,options){
+  var eachangle = 360/s;
+  var line = [];
+  for(var i=0;i<=s;i++) {
+    line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
+  }
+  makePath(ctx,[["points",line]]);
+  strokeIt(ctx,options);
+  fillIt(ctx,options);
+}
 
 /* Draw text */
 function drawText(ctx,text,x,y,options){
