@@ -331,13 +331,6 @@ function radiansToDegrees(num) {
 function getSatellite(start,angle,distance,isX) {
    return start+Math[isX?"cos":"sin"](degreesToRadians(angle))*distance;
 }
-/* Expects an XY object, an angle, and a distance. Returns an XY object */
-function getSatelliteXY(pos,angle,distance) {
-   return {
-      x:getSatellite(pos.x,angle,distance,true),
-      y:getSatellite(pos.y,angle,distance,false)
-   };
-}
 /* Returns the angle from two points */
 function angleFromPoints(x1,y1,x2,y2,inRadians){
    var angleRadians = Math.atan2(y2 - y1, x2 - x1);
@@ -359,13 +352,9 @@ function rand(n,x){
 function clamp(a,min,max){
     return Math.min(Math.max(a,min),max);
 }
-/* Return a percentage of the distance from one number to another: Min, Max, Percentage */
+/* Return a number between one number and another: Min, Max, Percentage */
 function numberToward(n,x,p) {
   return ((x-n)*p)+n;
-}
-/* Return a percentage of the distance from one point to another: Min, Max, Percentage */
-function positionToward(x1,y1,x2,y2,p) {
-  return {x:numberToward(x1,x2,p),y:numberToward(y1,y2,p)};
 }
 /* Returns an x y object */
 function xy(x,y){
@@ -412,6 +401,17 @@ function pointDistance(x1,y1,x2,y2) {
     var dx = x1 - x2;
     var dy = y1 - y2;
     return distance = Math.sqrt(dx * dx + dy * dy);
+}
+/* Return a point between one point and another: Position1, Position2, Percentage */
+function positionToward(x1,y1,x2,y2,p) {
+  return {x:numberToward(x1,x2,p),y:numberToward(y1,y2,p)};
+}
+/* Expects an XY object, an angle, and a distance. Returns an XY object */
+function getSatelliteXY(pos,angle,distance) {
+   return {
+      x:getSatellite(pos.x,angle,distance,true),
+      y:getSatellite(pos.y,angle,distance,false)
+   };
 }
 /* check if two number ranges overlap */
 function overlap(a0,a1,b0,b1){
