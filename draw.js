@@ -50,6 +50,14 @@ var pathmaker = {
          ctx.lineTo(pts[i].x,pts[i].y);
       }
    },
+   polygon:function(ctx,x,y,r,a,s){
+     var eachangle = 360/s;
+     var line = [];
+     for(var i=0;i<=s;i++) {
+       line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
+     }
+     pathmaker.points(ctx,line);
+   },
    circle:function(ctx,x,y,r,a1,a2,a3){
       pathmaker.arc(ctx,x,y,r,
         a1!==undefined?a1:0,
@@ -60,7 +68,7 @@ var pathmaker = {
       ctx.arc(x,y,r,a1,a2,a3);
    },
    rect:function(ctx,x,y,w,h){
-      pathPoints([
+      pathmaker.points(ctx,[
          {x:x,y:y},
          {x:x+w,y:y},
          {x:x+w,y:y+h},
@@ -130,10 +138,17 @@ function drawCircle(ctx,x,y,r,options){
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
-/* Draw a rectangle */
+/* Draw a rectangle: x,y, width, height */
 function drawRect(ctx,x,y,w,h,options){
    ctx = overRide(ctx,options);
    ctx.fillRect(x,y,w,h);
+}
+/* Draw a Polygon: x,y, radius, start angle, sides */
+function drawPolygon(ctx,x,y,r,a,s,options){
+   ctx = overRide(ctx,options);
+   makePath(ctx,[["polygon",x,y,r,a,s]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
 }
 /* Draw a rectangle with a random color, using the rand helper function */
 function drawRandomRect(ctx,x,y,w,h,options){
@@ -343,6 +358,14 @@ function rand(n,x){
 /* Make sure a number does not passbelow a min or above a max */
 function clamp(a,min,max){
     return Math.min(Math.max(a,min),max);
+}
+/* Return a percentage of the distance from one number to another: Min, Max, Percentage */
+function numberToward(n,x,p) {
+  return ((x-n)*p)+n;
+}
+/* Return a percentage of the distance from one point to another: Min, Max, Percentage */
+function positionToward(x1,y1,x2,y2,p) {
+  return {x:numberToward(x1,x2,p),y:numberToward(y1,y2,p)};
 }
 /* Returns an x y object */
 function xy(x,y){
