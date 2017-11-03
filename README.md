@@ -2,11 +2,15 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use. It also abstracts drawing paths into something that can be handled separately from filling and stroking in order to greatly enhance performance when drawing layers in certain instances. It also includes the maths.js and event.js libraries.  
+[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use, basic maths for geometry and trigonometry, and some very basic event data for XY coordinates. It includes the canvas.js, maths.js, and events.js libraries.  
 
 Dependencies - **jQuery** - For event detection
 
 [Color.js](#user-content-color-tools-js) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
+
+[Canvas.js](#user-content-canvas-tools-js) is an abstraction library for javascript and the HTML5 Canvas. This library not only simplifies drawing a number of common shapes, but also includes other things like grids, and also abstracts drawing paths into something that can be handled separately from filling and stroking in order to greatly enhance performance when drawing layers in certain instances. 
+
+Dependencies - **jQuery, Maths.js**
 
 [Event.js](#user-content-event-tools-js) is an event handling library for javascript. It uses jQuery in order to simplify turning any touch, click, or pen input into a return or even just a simple xy coordinate return.   
 
