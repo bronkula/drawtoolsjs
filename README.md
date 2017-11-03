@@ -2,10 +2,17 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use. However it adds some standardization for path drawing, as well as event handling.  
+[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use. It also abstracts drawing paths into something that can be handled separately from filling and stroking in order to greatly enhance performance when drawing layers in certain instances. It also includes the maths.js and event.js libraries.  
+
 Dependencies - **jQuery** - For event detection
 
-[Color.js](#user-content-color-tools) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
+[Color.js](#user-content-color-tools-js) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
+
+[Event.js](#user-content-event-tools-js) is an event handling library for javascript. It uses jQuery in order to simplify turning any touch, click, or pen input into a return or even just a simple xy coordinate return.   
+
+Dependencies - **jQuery**
+
+[Maths.js](#user-content-maths-tools-js) is a maths library for javascript. It has the basic concept math for geometry, trigonometry, and calculus to give the user a more easy to use, and possibly understand set of tools for positional math in games and art projects.
 
 
 ## Draw Tools JS
@@ -43,7 +50,9 @@ drawCircle(ctx,50,50,25,{fillStyle:"blue"});
 
 Ok, so we've included the drawtools library. You see that right? Don't mess up that part. Now we use the drawCircle function with the context, a width and height of 50, a radius of half that, and an options object that includes a fillStyle color.
 
-This is ok, but now let's use the positional tools to draw a circle wherever we click on the canvas. Also, let's include some jquery, because it sure helps with event delegation and element selection.
+
+## Event Tools JS
+This is ok, but now let's use the Event Tools to draw a circle wherever we click on the canvas. Also, let's include some jquery, because it sure helps with event delegation and element selection... And also because the Event Tools require it...
 
 ```html
 <canvas width="400" height="400"></canvas>
@@ -59,6 +68,46 @@ cvs.on("mousedown touchstart",function(e){
   drawCircle(ctx,pos.x,pos.y,25,{fillStyle:"blue"});
 });
 </script>
+```
+
+
+## Maths Tools JS
+The Maths file is really all about not having to think about all that hard positional math that comes with geometry and trigonometry.
+
+Let's really get in here now. Let's use the Event Tools to gather a position we'll call `mouse` any time that the mouse is moved around. By storing this value in a global variable, we can access it whether the mouse is moving or not.
+
+Then we'll start a `setInterval` when the mouse is pressed. Now every 10 milliseconds, we'll draw a circle that is rotating around the point of our mouse, using the `getSatelliteXY` function, from our Maths Tools. This will get a point somewhere around a point, based on an angle and distance given. We're also starting a number that increments every time our interval gets called, which will increase the angle of the satellite every tick.
+
+```html
+<canvas width="400" height="400" style="border:1px solid #ddd;"></canvas>
+
+	<script src="http://culurs.com/js/jquery-2.2.1.min.js"></script>
+	<script src="http://culurs.com/js/drawtools.js"></script>
+	<script>
+	var cvs = $("canvas");
+	var ctx = cvs[0].getContext("2d");
+	var drawing = false;
+	var num = 0;
+	var mouse = {x:0,y:0};
+
+	cvs
+	  .on("mousedown touchstart",function(e){
+	    drawing = setInterval(function(){
+	      num+=2;
+	      var pos = getSatelliteXY(mouse,num%360,40);
+	      drawCircle(ctx,pos.x,pos.y,2,{fillStyle:"blue"});
+	    },10);
+	    mouse = getEventXY(e);
+	    ;
+	  })
+	  .on("mouseup touchend",function(e){
+	    clearInterval(drawing);
+	    num=0;
+	  })
+	  .on("mousemove touchmove",function(e){
+	    mouse = getEventXY(e);
+	  });
+	</script>
 ```
 
 ## Color Tools JS
