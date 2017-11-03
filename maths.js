@@ -1,4 +1,9 @@
-
+/*
+ * Maths.js from the DrawTools.js library
+ * Creator: Hamilton Cline
+ * Email: hamdiggy@gmail.com
+ * Website: hamiltondraws.com
+*/
 
 /*---------------------- Math Helper Functions -----------------------------*/
 
