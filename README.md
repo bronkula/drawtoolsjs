@@ -8,7 +8,7 @@ Dependencies - **jQuery** - For event detection
 [Color.js](#user-content-color-tools) is a color handling library for javascript. It easily converts between Hex colors, RGB colors, HSL colors, and even CMYK colors. It outputs easy strings for css and presentation.
 
 
-## Draw Tools
+## Draw Tools JS
 Many of the actual drawing tools in the draw.js library (as opposed to the positional tools) use similar methodologies for arguments. They use a context to be applied, some values necessary for the particular shape, and then an options object. This object should be all the relevant context options for drawing, such as colors and line widths, that would normally be applied to a canvas context.
 
 So, where to start? Well, it helps to come at this with a cursory understanding of the html5 canvas already. Much of this library is simplifying certain overly complex common operations when using the canvas.
@@ -61,7 +61,7 @@ cvs.on("mousedown touchstart",function(e){
 </script>
 ```
 
-## Color Tools
+## Color Tools JS
 
 Color.js is a couple object types for handling color. The most basic color objects are RGB, HSL, and CMYK. Then there is the COLOR object. This has each of the previous objects as properties, as well as a hex property.
 
