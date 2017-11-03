@@ -1,3 +1,9 @@
+/*
+ * Event.js from the DrawTools.js library
+ * Creator: Hamilton Cline
+ * Email: hamdiggy@gmail.com
+ * Website: hamiltondraws.com
+*/
 
 /*------------------------------- Point Detection Functions -----------------------*/
 /* These Require jQuery Events */
