@@ -81,8 +81,10 @@ function simpleRatio(nmin,nmax,omax) {
 }
 
 /* Round number n to nearest number x */
-function roundTo(n,x) {
-   x*Math.round(n/x);
+function roundTo(n,x){
+   if(x<1){var m=(""+x).split(".");var m2=Math.pow(10,m[1].length);n*=m2;x*=m2;}
+   var r=x*Math.round(n/x);
+   return m2?r/m2:r;
 }
 
 
