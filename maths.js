@@ -80,6 +80,11 @@ function simpleRatio(nmin,nmax,omax) {
    return nmin/nmax*omax;
 }
 
+/* Round number n to nearest number x */
+function roundTo(n,x) {
+   x*Math.round(n/x);
+}
+
 
 
 
