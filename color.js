@@ -21,7 +21,8 @@ function COLOR(t,o) {
     this.cmyk = new CMYK(0,0,0,0);
     this.hex = "000000";
     if(t!==undefined) {
-        this.ov(this[t],o);
+        if(t=="hex") this.hex = o;
+        else this.ov(this[t],o);
         this.updateVals(t);
     }
 };
