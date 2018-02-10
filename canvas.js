@@ -139,7 +139,9 @@ function drawCircle(ctx,x,y,r,options){
 /* Draw a rectangle: x,y, width, height */
 function drawRect(ctx,x,y,w,h,options){
    ctx = overRide(ctx,options);
-   ctx.fillRect(x,y,w,h);
+   makePath(ctx,[["rect",x,y,w,h]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
 }
 /* Draw a Polygon: x,y, radius, start angle, sides */
 function drawPolygon(ctx,x,y,r,a,s,options){
