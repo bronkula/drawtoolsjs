@@ -1,3 +1,4 @@
+// Expects jQuery and Lodash
 
 function showData(arr,template_string,target){
 	var output = "";
