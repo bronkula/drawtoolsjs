@@ -10,7 +10,7 @@ or returns the output string if no target_selector is given
 example:
 showDataList(
 	[{x:10,y:10},{x:20,y:5}],
-	`<div><%= x %> x <%= y%></div>`,
+	`<div><%= x %> x <%= y %></div>`,
 	'.output'
 	);
 */
@@ -33,10 +33,10 @@ an optional template_string and target_selector to activate the showDataList fun
 
 example:
 showDataList(
-	[{x:10,y:10},{x:20,y:5}],
+	[{name:'George',email:'george@gmail.com'},{name:'Frank',email:'frank@gmail.com'}],
 	'George',
-	'email,name,description',
-	`<div><%= x %> x <%= y%></div>`,
+	'email,name',
+	`<div><%= name %> @ <%= email %></div>`,
 	'.output'
 	);
 */
