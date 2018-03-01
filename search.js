@@ -1,4 +1,5 @@
-// Expects jQuery and Lodash
+// Requires Lodash full build for .filter and .template
+// https://cdn.jsdelivr.net/npm/lodash@4.17.5/lodash.min.js
 
 
 /* 
@@ -21,7 +22,7 @@ function showDataList(object_array,template_string,target_selector){
 		output += templ(object_array[i]);
 	}
 	if(!target_selector) return output;
-	else $(target_selector).html(output);
+	else document.querySelector(target_selector).innerHTML = output;
 }
 
 
