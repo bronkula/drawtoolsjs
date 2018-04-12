@@ -40,6 +40,8 @@ function rand(n,x){
 function clamp(a,min,max){
     return Math.min(Math.max(a,min),max);
 }
+/* Make sure a number does not go beyond a min or max, and wrap around to the other side instead */
+var clampWrap = (a,min,max) => a>max?min:a<min?max:a;
 /* Return a number between one number and another: Min, Max, Percentage */
 function numberToward(n,x,p) {
   return ((x-n)*p)+n;
