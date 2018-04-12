@@ -22,13 +22,14 @@ function COLOR(o,t) {
     this.hex = "000000";
     
     if(t===undefined) {
-        if(this.hexReg.test(o)) t = "hex";
+        if(COLOR.hexReg.test(o)) t = "hex";
         else if(o instanceof RGB) t = "rgb";
-        else if(this.rgbReg.test(o)) t = "rgbs";
+        else if(COLOR.rgbReg.test(o)) t = "rgbs";
         else if(o instanceof HSL) t = "hsl";
-        else if(this.hslReg.test(o)) t = "hsls";
-        else if(o!==undefined) t = "word";
+        else if(COLOR.hslReg.test(o)) t = "hsls";
+        else if(/[a-zA-z]+/.test(o)) t = "word";
     }
+    console.log(t)
     
     if(t!==undefined) {
         this.setVal(t,o);
@@ -36,9 +37,9 @@ function COLOR(o,t) {
     }
 };
 
-COLOR.prototype.hexReg = /#?[0-9a-fA-F]{3,6}/;
-COLOR.prototype.rgbReg = /rgba?\((\d+),(\d+),(\d+)[,\d\.]*\)/;
-COLOR.prototype.hslReg = /hsla?\((\d+),(\d+)%,(\d+)%[,\d\.]*\)/;
+COLOR.hexReg = /^#?[0-9a-fA-F]{3,6}/;
+COLOR.rgbReg = /^rgba?\((\d+),\s*(\d+),\s*(\d+)[,\d\.]*\)/;
+COLOR.hslReg = /^hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[,\d\.]*\)/;
 
     COLOR.prototype.ov = function(o1,o2){ // override function
        if(!o2) return o1;
@@ -61,8 +62,8 @@ COLOR.prototype.hslReg = /hsla?\((\d+),(\d+)%,(\d+)%[,\d\.]*\)/;
                 this.ov(this.rgb,v);
                 break;
             case "rgbs":
-                reg = this.rgbReg.exec(v);
-                this.ov(this.rgb,new RGB(reg[1],reg[2],reg[3]);
+                reg = COLOR.rgbReg.exec(v);
+                this.ov(this.rgb,new RGB(reg[1],reg[2],reg[3]));
                 k = "rgb";
                 break;
             case "h":
@@ -74,8 +75,8 @@ COLOR.prototype.hslReg = /hsla?\((\d+),(\d+)%,(\d+)%[,\d\.]*\)/;
                 this.ov(this.hsl,v);
                 break;
             case "hsls":
-                reg = this.hslReg.exec(v);
-                this.ov(this.hsl,new HSL(reg[1],reg[2],reg[3]);
+                reg = COLOR.hslReg.exec(v);
+                this.ov(this.hsl,new HSL(reg[1],reg[2],reg[3]));
                 k = "hsl";
                 break;
             case "c":
@@ -148,9 +149,9 @@ COLOR.prototype.hslReg = /hsla?\((\d+),(\d+)%,(\d+)%[,\d\.]*\)/;
             c = ( 1 - r - k ) / ( 1 - k ),
             m = ( 1 - g - k ) / ( 1 - k ),
             y = ( 1 - b - k ) / ( 1 - k );
-        this.cmyk.c = c * 255;
-        this.cmyk.m = m * 255;
-        this.cmyk.y = y * 255;
+        this.cmyk.c = c * 255 || 0;
+        this.cmyk.m = m * 255 || 0;
+        this.cmyk.y = y * 255 || 0;
         this.cmyk.k = k * 255;
         return this;
     };
