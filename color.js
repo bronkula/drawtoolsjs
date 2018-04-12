@@ -15,17 +15,31 @@ function CMYK(c,m,y,k) {
     this.y = +y;
     this.k = +k;
 }
-function COLOR(t,o) {
+function COLOR(o,t) {
     this.rgb = new RGB(0,0,0);
     this.hsl = new HSL(0,0,0);
     this.cmyk = new CMYK(0,0,0,0);
     this.hex = "000000";
+    
+    if(t===undefined) {
+        if(this.hexReg.test(o)) t = "hex";
+        else if(o.typeOf == "RGB") t = "rgb";
+        else if(this.rgbReg.test(o)) t = "rgbs";
+        else if(o.typeOf == "HSL") t = "hsl";
+        else if(this.hslReg.test(o)) t = "hsls";
+        else if(o!==undefined) t = "word";
+    }
+    
     if(t!==undefined) {
-        if(t=="hex") this.hex = o;
-        else this.ov(this[t],o);
+        this.setVal(t,o);
         this.updateVals(t);
     }
 };
+
+COLOR.prototype.hexReg = /#?[0-9a-fA-F]{3,6}/;
+COLOR.prototype.rgbReg = /rgba?\((\d+),(\d+),(\d+)[,\d\.]*\)/;
+COLOR.prototype.hslReg = /hsla?\((\d+),(\d+)%,(\d+)%[,\d\.]*\)/;
+
     COLOR.prototype.ov = function(o1,o2){ // override function
        if(!o2) return o1;
        for(var i in o2) {
@@ -36,7 +50,7 @@ function COLOR(t,o) {
     };
     COLOR.prototype.setVal = function(k,v){
         k=k||"r";
-        var ok = {};
+        var ok = {},reg;
         switch(k) {
             case "r":
             case "g":
@@ -46,6 +60,11 @@ function COLOR(t,o) {
             case "rgb":
                 this.ov(this.rgb,v);
                 break;
+            case "rgbs":
+                reg = this.rgbReg.exec(v);
+                this.ov(this.rgb,new RGB(reg[1],reg[2],reg[3]);
+                k = "rgb";
+                break;
             case "h":
             case "s":
             case "l":
@@ -53,6 +72,11 @@ function COLOR(t,o) {
                 break;
             case "hsl":
                 this.ov(this.hsl,v);
+                break;
+            case "hsls":
+                reg = this.hslReg.exec(v);
+                this.ov(this.hsl,new HSL(reg[1],reg[2],reg[3]);
+                k = "hsl";
                 break;
             case "c":
             case "m":
@@ -64,7 +88,12 @@ function COLOR(t,o) {
                 this.ov(this.cmyk,v);
                 break;
             case "hex":
-                this.hex = v;
+                v = v[0]=="#"?v.substr(1):v;
+                this.hex = v.length==3?v[0]+v[0]+v[1]+v[1]+v[2]+v[2]:v;
+                break;
+            case "word":
+                this.hex = this.wordToHex(v);
+                k = "hex";
                 break;
         }
         this.updateVals(k);
@@ -126,9 +155,10 @@ function COLOR(t,o) {
         return this;
     };
     COLOR.prototype.rgbToHex = function() {
-        this.hex = ("0"+Math.round(this.rgb.r).toString(16)).substr(-2)+
-        ("0"+Math.round(this.rgb.g).toString(16)).substr(-2)+
-        ("0"+Math.round(this.rgb.b).toString(16)).substr(-2);
+        this.hex = 
+            ("0"+Math.round(this.rgb.r).toString(16)).substr(-2)+
+            ("0"+Math.round(this.rgb.g).toString(16)).substr(-2)+
+            ("0"+Math.round(this.rgb.b).toString(16)).substr(-2);
         return this;
     };
     COLOR.prototype.hslToRgb = function() {
@@ -150,6 +180,12 @@ function COLOR(t,o) {
         this.rgb.b = b * 255;
         return this;
     };
+
+    COLOR.prototype.wordToHex = function(str){ 
+      var ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = str;
+      return ctx.fillStyle.substr(1);
+    }
     COLOR.prototype.hue2rgb = function(p, q, t){
         if(t < 0) t += 1;
         if(t > 1) t -= 1;
@@ -172,15 +208,25 @@ function COLOR(t,o) {
         return this;
     };
     COLOR.prototype.hexToRgb = function() {
-        this.rgb.r = parseInt(this.hex.substr(0,2),16);
-        this.rgb.g = parseInt(this.hex.substr(2,2),16);
-        this.rgb.b = parseInt(this.hex.substr(4,2),16);
+        if(this.hex.length==3) {
+            this.rgb.r = parseInt(this.hex[0]+this.hex[0],16);
+            this.rgb.g = parseInt(this.hex[1]+this.hex[1],16);
+            this.rgb.b = parseInt(this.hex[2]+this.hex[2],16);
+        } else {
+            this.rgb.r = parseInt(this.hex.substr(0,2),16);
+            this.rgb.g = parseInt(this.hex.substr(2,2),16);
+            this.rgb.b = parseInt(this.hex.substr(4,2),16);
+        }
         return this;
     };
-    COLOR.prototype.toString = function(type) {
+    COLOR.prototype.toString = function(type,alpha) {
         switch(type) {
             case "rgb":return "rgb("+Math.round(this.rgb.r)+","+Math.round(this.rgb.g)+","+Math.round(this.rgb.b)+")";
+            case "rgba":return "rgba("+Math.round(this.rgb.r)+","+Math.round(this.rgb.g)+","+Math.round(this.rgb.b)+","+alpha+")";
+            case "rgbv":return Math.round(this.rgb.r)+","+Math.round(this.rgb.g)+","+Math.round(this.rgb.b);
             case "hsl":return "hsl("+Math.round(this.hsl.h)+","+Math.round(this.hsl.s)+"%,"+Math.round(this.hsl.l)+"%)";
+            case "hsla":return "hsla("+Math.round(this.hsl.h)+","+Math.round(this.hsl.s)+"%,"+Math.round(this.hsl.l)+"%,"+alpha+")";
+            case "hslv":return Math.round(this.hsl.h)+","+Math.round(this.hsl.s)+"%,"+Math.round(this.hsl.l)+"%";
             case "cmyk":return "cmyk("+Math.round(this.cmyk.c)+","+Math.round(this.cmyk.m)+","+Math.round(this.cmyk.y)+","+Math.round(this.cmyk.k)+")";
             case "hex":return "#"+this.hex;
         }
