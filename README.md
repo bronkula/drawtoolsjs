@@ -2,7 +2,7 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use, basic maths for geometry and trigonometry, and some very basic event data for XY coordinates. It includes the canvas.js, maths.js, colors.js, and events.js libraries.  
+[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use, basic maths for geometry and trigonometry, and some very basic event data for XY coordinates. It includes the canvas.js, maths.js, color.js, and events.js libraries.  
 
 Dependencies - **jQuery** - For event detection
 
