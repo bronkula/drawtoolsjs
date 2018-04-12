@@ -197,6 +197,7 @@ function getEventXY(e,o){
 
 
 
+
 function RGB(r,g,b) {
     this.r = +r;
     this.g = +g;
@@ -226,6 +227,10 @@ function COLOR(o,t) {
         else if(o instanceof HSL) t = "hsl";
         else if(COLOR.hslReg.test(o)) t = "hsls";
         else if(/[a-zA-z]+/.test(o)) t = "word";
+        else if(typeof o == "object") {
+            if(o.r!==undefined) t = "rgb";
+            if(o.h!==undefined) t = "hsl";
+        }
     }
     console.log(t)
     
