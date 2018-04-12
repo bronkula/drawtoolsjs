@@ -23,9 +23,9 @@ function COLOR(o,t) {
     
     if(t===undefined) {
         if(this.hexReg.test(o)) t = "hex";
-        else if(o.typeOf == "RGB") t = "rgb";
+        else if(o instanceof RGB) t = "rgb";
         else if(this.rgbReg.test(o)) t = "rgbs";
-        else if(o.typeOf == "HSL") t = "hsl";
+        else if(o instanceof HSL) t = "hsl";
         else if(this.hslReg.test(o)) t = "hsls";
         else if(o!==undefined) t = "word";
     }
