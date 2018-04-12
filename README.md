@@ -2,7 +2,7 @@
 
 Created by Hamilton Cline
 
-[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use, basic maths for geometry and trigonometry, and some very basic event data for XY coordinates. It includes the canvas.js, maths.js, and events.js libraries.  
+[Draw.js](#user-content-draw-tools-js) is a canvas library for javascript. It mostly abstracts the basic canvas functionality into something easier to use, basic maths for geometry and trigonometry, and some very basic event data for XY coordinates. It includes the canvas.js, maths.js, colors.js, and events.js libraries.  
 
 Dependencies - **jQuery** - For event detection
 
@@ -122,7 +122,7 @@ New COLOR objects can be created with or without an initial value. The default c
 
 ```javascript
 var black = new COLOR();
-var red = new COLOR("rgb",{r:255,g:0,b:0});
+var red = new COLOR({r:255,g:0,b:0},"rgb");
 ```
 
 Values of color objects can simply be updated, or set with the setVal() method which requires a value type, and a value which can be simple or a HSL/RGB/CMYK color object.
@@ -130,7 +130,7 @@ Values of color objects can simply be updated, or set with the setVal() method w
 ```javascript
 var c = new COLOR();
 c.hsl.h = 255; // Will not update other color objects
-c.setVal("hex","25e79c");
+c.setVal("hex","#25e79c");
 c.setVal("rgb",{r:156,g:57,b:211});
 ```
 
@@ -139,6 +139,7 @@ Output strings can be generated for all the color object types using the toStrin
 ```javascript
 var c = new COLOR("rgb",{r:255,g:0,b:0});
 console.log(c.toString("hsl")); // returns `hsl(0,100%,50%)`
+console.log(c.toString("rgba",0.5)); // returns `rgba(255,0,0,0.5)`
 ```
 
 
