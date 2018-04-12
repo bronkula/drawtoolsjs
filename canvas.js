@@ -82,7 +82,7 @@ var pathmaker = {
    },
    roundRect:function(ctx,x,y,w,h,r){
       if (typeof r === 'undefined') r = 0;
-      if (typeof r === 'number') {
+      else if (typeof r === 'number') {
          r = {tl: r, tr: r, br: r, bl: r};
       } else {
          r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
@@ -230,6 +230,22 @@ function drawRoundRect(ctx, x, y, w, h, r, options) {
    fillIt(ctx,options);
 }
 
+/* Draw a gradient
+direction: [x1,y1,x2,y2]
+stops: [[percent,color],[percent,color]]
+position: [x,y,w,h]
+*/
+function drawGradient(ctx,direction,stops,position) {
+  var grd=ctx.createLinearGradient.apply(ctx,direction);
+  for(var i in stops) {
+    grd.addColorStop.apply(grd,stops[i]);
+  }
+  ctx.fillStyle=grd;
+  ctx.fillRect.apply(ctx,position);
+}
+
+
+
 /* draw a series of circle at x y coordinates */
 function drawPoints(ctx,line,radius,options) {
    pathmaker.start(ctx);
@@ -313,4 +329,14 @@ function drawImageTSR(ctx,img,x,y,w,h,sx,sy,r) {
   translateScaleRotate(ctx,x,y,sx,sy,r,function(){
     ctx.drawImage(img,-w*0.5,-h*0.5,w,h);
   });
+}
+
+
+
+
+/* This function will store a canvas into an image */
+function storeImage(cvs,w,h) { 
+  var i = new Image();
+  i.src = cvs[0].toDataURL();
+  return i;
 }
