@@ -41,7 +41,6 @@ function COLOR(o,t) {
             if(o.h!==undefined) t = "hsl";
         }
     }
-    console.log(t)
     
     if(t!==undefined) {
         this.setVal(t,o);
