@@ -1,3 +1,11 @@
+/*
+ * Color.js from the DrawTools.js library
+ * Creator: Hamilton Cline
+ * Email: hamdiggy@gmail.com
+ * Website: hamiltondraws.com
+*/
+
+
 
 function RGB(r,g,b) {
     this.r = +r;
@@ -213,15 +221,9 @@ COLOR.hslReg = /^hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[,\d\.]*\)/;
         return this;
     };
     COLOR.prototype.hexToRgb = function() {
-        if(this.hex.length==3) {
-            this.rgb.r = parseInt(this.hex[0]+this.hex[0],16);
-            this.rgb.g = parseInt(this.hex[1]+this.hex[1],16);
-            this.rgb.b = parseInt(this.hex[2]+this.hex[2],16);
-        } else {
-            this.rgb.r = parseInt(this.hex.substr(0,2),16);
-            this.rgb.g = parseInt(this.hex.substr(2,2),16);
-            this.rgb.b = parseInt(this.hex.substr(4,2),16);
-        }
+        this.rgb.r = parseInt(this.hex.substr(0,2),16);
+        this.rgb.g = parseInt(this.hex.substr(2,2),16);
+        this.rgb.b = parseInt(this.hex.substr(4,2),16);
         return this;
     };
     COLOR.prototype.toString = function(type,alpha) {
@@ -236,3 +238,4 @@ COLOR.hslReg = /^hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[,\d\.]*\)/;
             case "hex":return "#"+this.hex;
         }
     };
+
