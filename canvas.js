@@ -186,6 +186,31 @@ function drawShape(ctx,x,y,r,a,s,options){
   fillIt(ctx,options);
 }
 
+/* Create a curryed function which preloads an image to be placed onto canvas */
+/*
+example:
+var drawMyImage = drawableImage("imageurl.jpg");
+drawMyImage(ctx,10,10,50,50);
+*/
+function drawableImage(url){
+  var loaded = false;
+  var i = new Image();
+  i.onload = function(){
+    loaded = true;
+  }
+  i.src = url;
+
+  var drawI = function(ctx,x,y,w,h){
+    console.log(i)
+    if(!loaded) setTimeout(drawI,10);
+    else {
+      console.log(arguments)
+      ctx.drawImage(i,x,y,w,h);
+    }
+  }
+  return drawI;
+}
+
 /* Draw text */
 function drawText(ctx,text,x,y,options){
    ctx = overRide(ctx,options);
