@@ -31,10 +31,18 @@ var trueAngle = (a) => a<0?360+a:a;
 var rand = (n,x) => Math.round(Math.random()*(x-n))+n;
    
 /* Make sure a number does not passbelow a min or above a max */
-var clamp = (a,min,max) => Math.min(Math.max(a,min),max);
-   
+var clamp = (a,min,max) => a>max?max:a<min?min:a;
 /* Make sure a number does not go beyond a min or max, and wrap around to the other side instead */
 var clampWrap = (a,min,max) => a>max?min:a<min?max:a;
+/* Make sure a number does not passbelow a min or above a max, and handle if the clamp is around the outside of a loop */
+function circleclamp(a,min,max){
+   if(max<min) {
+      let d = ((min-max)*0.5)+max;
+      return a<=min&&a>d?min:a>=max&&a<d?max:a;
+   }
+   return a>max?max:a<min?min:a;
+}
+
 /* Return a number between one number and another: Min, Max, Percentage */
 var numberToward = (n,x,p) => ((x-n)*p)+n;
 
@@ -65,7 +73,21 @@ function overRide(o1,o2) {
 /* This function returns a number from one range transposed into another range */
 /* eg: rangeRatio(5,1,7,35,72) would result in 59.66. 5 inside of 1-7 is equal to 59.66 inside of 35-72. */
 var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
-   
+/* This function returns a number from one range transposed into another range, either of which could be loops */
+/* eg: rangeRatio(5,[1,7],[280,80,360]) would result in 26.66. 5 inside of 1-7 is equal to 26.66 inside of a looped range of 280-80 inside a loop of 360. */
+function circleRangeRatio(n,r1,r2) {
+   if(r1.length==3 && r1[0]>r1[1]) {
+      r1r = rangeRatio(n<=r1[1]?n+r1[2]:n,r1[0],r1[0]+(r1[2]-r1[0]+r1[1]),0,1);
+   } else {
+      r1r = (n-r1[0])/(r1[1]-r1[0]);
+   }
+   if(r2.length==3 && r2[0]>r2[1]) {
+      r2r = (r1r*(r2[2]-r2[0]+r2[1]))+r2[0];
+      return r2r>r2[2]?r2r-r2[2]:r2r;
+   } else {
+      return (r1r*(r2[1]-r2[0]))+r2[0];
+   }
+}
 /* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
 var simpleRatio = (nmin,nmax,omax) => nmin/nmax*omax;
 
