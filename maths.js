@@ -120,16 +120,16 @@ function circleRangeRatio(n,r1,r2) {
 }
 
 
-function loopRangeRatio(n,r1,r2) {
-   if(r1[2] && r1[0]<0) {
-      var r1p = partof(n<=r1[1]?n+r1[2]:n, r1[0], r1[0]+(r1[2]-r1[0]+r1[1]);
-   } else var r1p = partof(n, r1[0], r1[1]);
-   if(r2[2] && r2[0]<0) {
-      var r2p = toward(r1p, r2[2], r2[0]+r2[1], r2[0]);
-      var r = r2p>r2[2]?r2p-r2[2]:r2p;
-   } else var r = toward(r1p, r2[0], r2[1]);
-   return r;
-}
+// function loopRangeRatio(n,r1,r2) {
+//    if(r1[2] && r1[0]<0) {
+//       var r1p = partof(n<=r1[1]?n+r1[2]:n, r1[0], r1[0]+(r1[2]-r1[0]+r1[1]);
+//    } else var r1p = partof(n, r1[0], r1[1]);
+//    if(r2[2] && r2[0]<0) {
+//       var r2p = toward(r1p, r2[2], r2[0]+r2[1], r2[0]);
+//       var r = r2p>r2[2]?r2p-r2[2]:r2p;
+//    } else var r = toward(r1p, r2[0], r2[1]);
+//    return r;
+// }
 
 
 /* DEPRECATED */
