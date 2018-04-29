@@ -32,7 +32,8 @@ var rand = (n,x) => Math.round(Math.random()*(x-n))+n;
    
 /* Make sure a number does not passbelow a min or above a max */
 var clamp = (a,min,max) => a>max?max:a<min?min:a;
-/* Make sure a number does not go beyond a min or max, and wrap around to the other side instead */
+/* Make sure a number does not go beyond a min or max, and wrap around to the other side instead.
+Differently than a clampLoop, this number will always lose distance when wrapping. */
 var clampWrap = (a,min,max) => a>max?clampWrap(a-(max-min)-1,min,max):a<min?clampWrap(a+(max-min)+1,min,max):a;
 /* Make sure a number does not passbelow a min or above a max, and handle if the clamp is around the outside of a loop */
 function circleclamp(a,min,max){
@@ -42,9 +43,14 @@ function circleclamp(a,min,max){
    }
    return a>max?max:a<min?min:a;
 }
+// function circleclamp(a,min,max,loop){
+//    if(max<min) {
+//       let d = ((min-max)*0.5)+max;
+//       return a<=min&&a>d?min:a>=max&&a<d?max:a;
+//    }
+//    return clamp(a,min,max);
+// }
 
-/* Return a number between one number and another: Min, Max, Percentage */
-var numberToward = (n,x,p) => ((x-n)*p)+n;
 
 /* Returns an x y object */
 function xy(x,y){
@@ -70,9 +76,33 @@ function overRide(o1,o2) {
    }
    return o1;
 }
-/* This function returns a number from one range transposed into another range */
-/* eg: rangeRatio(5,1,7,35,72) would result in 59.66. 5 inside of 1-7 is equal to 59.66 inside of 35-72. */
-var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
+
+/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
+var ratio = (n,min,max) => n*min/max;
+
+/* This function returns an arbitrary positive number looped inside an arbitrary positive number range */
+var within = (n,min,max) => (n-min)%(max-min);
+   var withinCircle = (n) => within(n,0,360);
+   
+/* This function returns the percentage of an arbitrary number mapped to an arbitrary number range */
+var partof = (n,min,max) => (n-min)/(max-min);
+   var partofCircle = (n) => partof(n,0,360);
+   
+/* This function returns a number from an arbitrary number range using a percentage. Optional offset value.
+example:
+toward(0.5,10,20) > 15
+*/
+var toward = (n,min,max,o) => n*(max-min)+(o||min);
+/* This function maps a number from one arbitrary range onto another arbitrary range. Uses range arrays.
+example:
+mapRange(5,[0,10],[0,360]) > 180*/
+var mapRange = (n,r1,r2) => toward(partof(n,r1[0],r1[1]),r2[0],r2[1]);
+
+var clampLoop = (n,min,max) => { var d=within(n,min,max); return (d<0?max-min:0)+d+min; }
+   var clampCircle = (n) => clampLoop(n,0,360);
+
+
+
 /* This function returns a number from one range transposed into another range, either of which could be loops */
 /* eg: rangeRatio(5,[1,7],[280,80,360]) would result in 26.66. 5 inside of 1-7 is equal to 26.66 inside of a looped range of 280-80 inside a loop of 360. */
 function circleRangeRatio(n,r1,r2) {
@@ -88,8 +118,24 @@ function circleRangeRatio(n,r1,r2) {
       return (r1r*(r2[1]-r2[0]))+r2[0];
    }
 }
-/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
-var simpleRatio = (nmin,nmax,omax) => nmin/nmax*omax;
+
+
+function loopRangeRatio(n,r1,r2) {
+   if(r1[2] && r1[0]<0) {
+      var r1p = partof(n<=r1[1]?n+r1[2]:n, r1[0], r1[0]+(r1[2]-r1[0]+r1[1]);
+   } else var r1p = partof(n, r1[0], r1[1]);
+   if(r2[2] && r2[0]<0) {
+      var r2p = toward(r1p, r2[2], r2[0]+r2[1], r2[0]);
+      var r = r2p>r2[2]?r2p-r2[2]:r2p;
+   } else var r = toward(r1p, r2[0], r2[1]);
+   return r;
+}
+
+
+/* DEPRECATED */
+var numberToward = (n,x,p) => ((x-n)*p)+n;
+var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
+   
 
 /* Round number n to nearest number x */
 function roundTo(n,x){
@@ -107,11 +153,11 @@ function roundTo(n,x){
 function pointDistance(x1,y1,x2,y2) {
     var dx = x1 - x2;
     var dy = y1 - y2;
-    return distance = Math.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy);
 }
 /* Return a point between one point and another: Position1, Position2, Percentage */
 function positionToward(x1,y1,x2,y2,p) {
-  return {x:numberToward(x1,x2,p),y:numberToward(y1,y2,p)};
+  return {x:toward(p,x1,x2),y:toward(p,y1,y2)};
 }
 /* Expects an XY object, an angle, and a distance. Returns an XY object */
 function getSatelliteXY(pos,angle,distance) {
