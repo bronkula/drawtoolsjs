@@ -197,6 +197,11 @@ function isIntersect(x0,y0,x1,y1,x2,y2,x3,y3) {
 function pointInRect(px,py,x1,y1,x2,y2){
    return px >= x1 && px <= x2 && py >= y1 && py <= y2;
 }
+function pointInArc(px,py,ax,ay,ir,or,as,ae) {
+   var a = angleFromPoints(px,py,ax,ay);
+   var d = pointDistance(px,py,ax,ay);
+   return a>=as && a<=ae && d>=ir && d<=or;
+}
 /* Detect if a rectangle is fully within another rectangle */
 function rectInRect(x0,y0,x1,y1,x2,y2,x3,y3) {
    return pointInRect(x0,y0,x2,y2,x3,y3) && pointInRect(x1,y1,x2,y2,x3,y3);
