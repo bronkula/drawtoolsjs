@@ -34,38 +34,38 @@ globalCompositeOperation:"source-over|destination-out"
 /*----------------------------------------------------------------------*/
 /*                         Path functions                               */
 
-var pathmaker = {
-   start:function(ctx){
+const pathmaker = {
+   start(ctx){
       ctx.beginPath();
    },
-   end:function(ctx){
+   end(ctx){
       ctx.closePath();
    },
-   points:function(ctx,pts){
+   point(ctx,pts){
       if(pts.length<2) return false;
       ctx.moveTo(pts[0].x,pts[0].y);
-      for(var i in pts) {
+      for(let i in pts) {
          ctx.lineTo(pts[i].x,pts[i].y);
       }
    },
-   polygon:function(ctx,x,y,r,a,s){
-     var eachangle = 360/s;
-     var line = [];
-     for(var i=0;i<=s;i++) {
-       line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
+   polygon(ctx,x,y,r,a,s){
+     let eachangle = 360/s;
+     let line = [];
+     for(let i=0;i<=s;i++) {
+       line.push(getSatelliteXY({x,y},a+(eachangle*i),r));
      }
      pathmaker.points(ctx,line);
    },
-   circle:function(ctx,x,y,r,a1,a2,a3){
+   circle(ctx,x,y,r,a1,a2,a3){
       pathmaker.arc(ctx,x,y,r,
         a1!==undefined?a1:0,
         a2!==undefined?a2:2*Math.PI,
         a3!==undefined?a3:undefined);
    },
-   arc:function(ctx,x,y,r,a1,a2,a3){
+   arc(ctx,x,y,r,a1,a2,a3){
       ctx.arc(x,y,r,a1,a2,a3);
    },
-   rect:function(ctx,x,y,w,h){
+   rect(ctx,x,y,w,h){
       pathmaker.points(ctx,[
          {x:x,y:y},
          {x:x+w,y:y},
@@ -74,13 +74,11 @@ var pathmaker = {
          {x:x,y:y}
       ]);
    },
-   pie:function(ctx,x,y,or,ir,sa,ea,ad){
-      sa = degreesToRadians(sa);
-      ea = sa + degreesToRadians(ea);
-      pathmaker.arc(ctx,x,y,or, sa, ea, !ad);
-      pathmaker.arc(ctx,x,y,ir, ea, sa, ad);
+   pie(ctx,x,y,or,ir,sa,ea,ad){
+      pathmaker.arc(ctx,x,y,or, sa, ea+sa, !ad);
+      pathmaker.arc(ctx,x,y,ir, ea+sa, sa, ad);
    },
-   roundRect:function(ctx,x,y,w,h,r){
+   roundRect(ctx,x,y,w,h,r){
       if (typeof r === 'undefined') r = 0;
       else if (typeof r === 'number') {
          r = {tl: r, tr: r, br: r, bl: r};
@@ -98,13 +96,9 @@ var pathmaker = {
       ctx.quadraticCurveTo(x, y, x + r.tl, y);
    }
 }
-function makePath(ctx,paths) {
+const makePath(ctx,paths) {
    pathmaker.start(ctx);
-   var type;
-   for(var i in paths) {
-      type = paths[i].splice(0,1,ctx)[0];
-      pathmaker[type].apply(null,paths[i]);
-   }
+   for(var i in paths) pathmaker[paths[i].splice(0,1,ctx)[0]].apply(null,paths[i]);
    pathmaker.end(ctx);
 }
 
@@ -113,45 +107,37 @@ function makePath(ctx,paths) {
 /*                         Draw functions                               */
 
 /* Stroke path */
-function strokeIt(ctx,options) {
+const strokeIt = (ctx,options) => {
    if(!options) return;
-   if(options.lineWidth) {
-      ctx = overRide(ctx,options);
-      ctx.stroke();
-   }
+   if(options.lineWidth) overRide(ctx,options).stroke();
 }
 /* Fill a path */
-function fillIt(ctx,options){
+const fillIt = (ctx,options) =>{
    if(!options) return;
-   if(options.fillStyle) {
-      ctx = overRide(ctx,options);
-      ctx.fill();
-   }
+   if(options.fillStyle) overRide(ctx,options).fill();
 }
 
 
 /* Draw a circle */
-function drawCircle(ctx,x,y,r,options){
+const drawCircle = (ctx,x,y,r,options) => {
    makePath(ctx,[["circle",x,y,r]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
 /* Draw a rectangle: x,y, width, height */
-function drawRect(ctx,x,y,w,h,options){
-   ctx = overRide(ctx,options);
+const drawRect = (ctx,x,y,w,h,options) => {
    makePath(ctx,[["rect",x,y,w,h]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
 /* Draw a Polygon: x,y, radius, start angle, sides */
-function drawPolygon(ctx,x,y,r,a,s,options){
-   ctx = overRide(ctx,options);
+const drawPolygon = drawShape = (ctx,x,y,r,a,s,options) => {
    makePath(ctx,[["polygon",x,y,r,a,s]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
 /* Draw a rectangle with a random color, using the rand helper function */
-function drawRandomRect(ctx,x,y,w,h,options){
+const drawRandomRect = (ctx,x,y,w,h,options) => {
    options.fillStyle = "rgba("+
       rand(120,250)+","+
       rand(120,250)+","+
@@ -161,7 +147,7 @@ function drawRandomRect(ctx,x,y,w,h,options){
    drawRect(ctx,x,y,w,h,options);
 }
 /* Draw one line segment */
-function drawSegment(ctx,x1,y1,x2,y2,options){
+const drawSegment = (ctx,x1,y1,x2,y2,options) => {
    makePath(ctx,[["points",[
       {x:x1,y:y1},
       {x:x2,y:y2}
@@ -169,21 +155,10 @@ function drawSegment(ctx,x1,y1,x2,y2,options){
    strokeIt(ctx,options);
 }
 /* Draw an array of line segments, allowing smooth connections */
-function drawLine(ctx,line,options){
+const drawLine = (ctx,line,options) => {
    makePath(ctx,[["points",line]]);
    strokeIt(ctx,options);
    fillIt(ctx,options);
-}
-/* Draw a shape with any number of sides */
-function drawShape(ctx,x,y,r,a,s,options){
-  var eachangle = 360/s;
-  var line = [];
-  for(var i=0;i<=s;i++) {
-    line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
-  }
-  makePath(ctx,[["points",line]]);
-  strokeIt(ctx,options);
-  fillIt(ctx,options);
 }
 
 /* Create a curryed function which preloads an image to be placed onto canvas */
@@ -192,7 +167,7 @@ example:
 var drawMyImage = drawableImage("imageurl.jpg");
 drawMyImage(ctx,10,10,50,50);
 */
-function drawableImage(url){
+const drawableImage = url => {
   var loaded = false;
   var i = new Image();
   i.onload = function(){
@@ -212,20 +187,20 @@ function drawableImage(url){
 }
 
 /* Draw text */
-function drawText(ctx,text,x,y,options){
+const drawText = (ctx,text,x,y,options) => {
    ctx = overRide(ctx,options);
    if(options.lineWidth) ctx.strokeText(text,x,y);
    if(options.fillStyle) ctx.fillText(text,x,y);
 }
 /* Draw text, replacing new lines characters with visible line breaks */
-function drawParagraph(ctx,text,x,y,lineHeight,options) {
+const drawParagraph = (ctx,text,x,y,lineHeight,options) => {
   var ps = text.split(/\n/);
   for(var i in ps) {
     drawText(ctx,ps[i],x,y+(lineHeight*i),options);
   }
 }
 /* Draw text with a cut out stroke */
-function drawLabel(ctx,text,x,y,options){
+const drawLabel = (ctx,text,x,y,options) => {
    ctx = overRide(ctx,options);
    ctx.globalCompositeOperation = "destination-out";
    ctx.strokeText(text,x,y);
@@ -234,7 +209,7 @@ function drawLabel(ctx,text,x,y,options){
 }
 
 /* Draw a circle with a cutout circle */
-function drawPulse(ctx,x,y,outerRadius,innerRadius,options){
+const drawPulse = (ctx,x,y,outerRadius,innerRadius,options) => {
    drawCircle(ctx,x,y,outerRadius,options);
    ctx.globalCompositeOperation = "destination-out";
    drawCircle(ctx,x,y,innerRadius,options);
@@ -242,14 +217,14 @@ function drawPulse(ctx,x,y,outerRadius,innerRadius,options){
 }
 
 /* Draw a pie shape or donut pie shape */
-function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options){
+const drawPie = (ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options) => {
    makePath(ctx,[["pie",x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
    fillIt(ctx,options);
    strokeIt(ctx,options);
 }
 
 // http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
-function drawRoundRect(ctx, x, y, w, h, r, options) {
+const drawRoundRect = (ctx, x, y, w, h, r, options) => {
    makePath(ctx,[["roundRect",x, y, w, h, r]])
    strokeIt(ctx,options);
    fillIt(ctx,options);
@@ -260,7 +235,7 @@ direction: [x1,y1,x2,y2]
 stops: [[percent,color],[percent,color]]
 position: [x,y,w,h]
 */
-function drawGradient(ctx,direction,stops,position) {
+const drawGradient = (ctx,direction,stops,position) => {
   var grd=ctx.createLinearGradient.apply(ctx,direction);
   for(var i in stops) {
     grd.addColorStop.apply(grd,stops[i]);
@@ -272,7 +247,7 @@ function drawGradient(ctx,direction,stops,position) {
 
 
 /* draw a series of circle at x y coordinates */
-function drawPoints(ctx,line,radius,options) {
+const drawPoints = (ctx,line,radius,options) => {
    pathmaker.start(ctx);
    for(var i in line) {
       pathmaker.circle(ctx,line[i].x,line[i].y,radius);
@@ -282,7 +257,7 @@ function drawPoints(ctx,line,radius,options) {
    fillIt(ctx,options);
 }
 /* draw a series of lines vertically and horizontally */
-function drawGrid(ctx,rows,cols,x,y,w,h,options) {
+const drawGrid = (ctx,rows,cols,x,y,w,h,options) => {
    pathmaker.start(ctx);
    // Draw the rows
    for(var i=0;i<=rows;i++) {
@@ -303,7 +278,7 @@ function drawGrid(ctx,rows,cols,x,y,w,h,options) {
    fillIt(ctx,options);
 }
 /* Draw a grid, a line, and a series of points */
-function drawLineGraph(ctx,line,x,y,w,h){
+const drawLineGraph = (ctx,line,x,y,w,h) => {
    drawGrid(ctx,3,5,x,y,w,h,{
       strokeStyle:"#ddd",
       lineWidth:2,
@@ -325,7 +300,7 @@ function drawLineGraph(ctx,line,x,y,w,h){
 
 
 // http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
-function rotateAndDo ( ctx, angleInRad , positionX, positionY, callback) {
+const rotateAndDo = ( ctx, angleInRad , positionX, positionY, callback) => {
    ctx.translate( positionX, positionY );
    ctx.rotate( angleInRad );
    callback();
@@ -333,7 +308,7 @@ function rotateAndDo ( ctx, angleInRad , positionX, positionY, callback) {
    ctx.translate( -positionX, -positionY );
 }
 /* This function does three operations, and saves first */
-function translateScaleRotate(ctx,x,y,sx,sy,r,fn) {
+const translateScaleRotate = (ctx,x,y,sx,sy,r,fn) => {
   ctx.save();
    ctx.translate(x,y);
    ctx.scale(sx,sy);
@@ -342,7 +317,7 @@ function translateScaleRotate(ctx,x,y,sx,sy,r,fn) {
   ctx.restore();
 }
 /* This function will Translate and then Scale, and saves first */
-function translateScale(ctx,x,y,sx,sy,fn) {
+const translateScale = (ctx,x,y,sx,sy,fn) => {
   ctx.save();
    ctx.translate(x,y);
    ctx.scale(sx,sy);
@@ -350,7 +325,7 @@ function translateScale(ctx,x,y,sx,sy,fn) {
   ctx.restore();
 }
 /* Translate, Scale, Rotate, then draw an image */
-function drawImageTSR(ctx,img,x,y,w,h,sx,sy,r) {
+const drawImageTSR = (ctx,img,x,y,w,h,sx,sy,r) => {
   translateScaleRotate(ctx,x,y,sx,sy,r,function(){
     ctx.drawImage(img,-w*0.5,-h*0.5,w,h);
   });
@@ -360,8 +335,8 @@ function drawImageTSR(ctx,img,x,y,w,h,sx,sy,r) {
 
 
 /* This function will store a canvas into an image */
-function storeImage(cvs,w,h) { 
+const storeImage = (cvs,w,h) => { 
   var i = new Image();
-  i.src = cvs[0].toDataURL();
+  i.src = cvs.toDataURL();
   return i;
 }
