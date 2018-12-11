@@ -24,27 +24,7 @@ const angleFromSides = (a,b,c) => Math.acos((c*c+a*a-b*b)/(2*c*a));
    
 /* A random number between n and x */
 const rand = (n,x) => Math.round(Math.random()*(x-n))+n;
-   
-/* Make sure a number does not passbelow a min or above a max */
-const clamp = (a,min,max) => a>max?max:a<min?min:a;
-/* Make sure a number does not go beyond a min or max, and wrap around to the other side instead.
-Differently than a clampLoop, this number will always lose distance when wrapping. */
-// const clampWrap = (a,min,max) => a>max?clampWrap(a-(max-min)-1,min,max):a<min?clampWrap(a+(max-min)+1,min,max):a;
-/* Make sure a number does not passbelow a min or above a max, and handle if the clamp is around the outside of a loop */
-// const circleclamp = (a,min,max) => {
-//    if(max<min) {
-//       let d = ((min-max)*0.5)+max;
-//       return a<=min&&a>d?min:a>=max&&a<d?max:a;
-//    }
-//    return a>max?max:a<min?min:a;
-// }
-// function circleclamp(a,min,max,loop){
-//    if(max<min) {
-//       let d = ((min-max)*0.5)+max;
-//       return a<=min&&a>d?min:a>=max&&a<d?max:a;
-//    }
-//    return clamp(a,min,max);
-// }
+
 
 
 /* Returns an x y object from x y values */
@@ -63,6 +43,9 @@ const overRide = (o1,o2) => !o2?o1:Object.assign(o1,o2);
 
 /* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
 const ratio = (min,max) => n => n*min/max;
+
+/* Make sure a number does not passbelow a min or above a max */
+const clamp = (min,max) => n => n>max?max:n<min?min:n;
 
 /* Given a curried max value, attempts to bring negative numbers to positive range of loop */
 const trueNumber = max => n => n<0?n+max:n;
@@ -84,59 +67,27 @@ const partof = (min,max) => n => (n-min)/(max-min);
    
 /* This function returns a number from an arbitrary number range using a percentage. Optional offset value.
 example:
-toward(0.5,10,20) > 15
+toward(10,20)(0.5) > 15
 */
 const toward = (min,max,o=false) => n => n*(max-min)+(o||min);
-/* This function maps a number from one arbitrary range onto another arbitrary range. Uses range arrays.
+/* This function maps a number from one arbitrary range onto another arbitrary range.
 example:
-mapRange(5,[0,10],[0,360]) > 180*/
-const mapRange = (a,[min1,max1],[min2,max2]) => toward(min2,max2)(partof(min1,max1)(a));
+mapRange(5,0,10,0,360) > 180*/
+const mapRange = (n,min1,max1,min2,max2) => toward(min2,max2)(partof(min1,max1)(n));
 
-//const clampLoop = (min,max) => n => { let d=within(min,max)(n); return (d<0?max-min:0)+d+min; }
-//   const clampCircle = clampLoop(0,360);
+/* Round number n to nearest number x */
+const roundTo = (n,x) => {
+   if(x<1){var m=(""+x).split(".");var m2=Math.pow(10,m[1].length);n*=m2;x*=m2;}
+   let r=x*Math.round(n/x);
+   return m2?r/m2:r;
+}
 
-
-
-/* This function returns a number from one range transposed into another range, either of which could be loops */
-/* eg: rangeRatio(5,[1,7],[280,80,360]) would result in 26.66. 5 inside of 1-7 is equal to 26.66 inside of a looped range of 280-80 inside a loop of 360. */
-// function circleRangeRatio(n,r1,r2) {
-//    if(r1[2] && r1[0]>r1[1]) {
-//       r1r = rangeRatio(n<=r1[1]?n+r1[2]:n,r1[0],r1[0]+(r1[2]-r1[0]+r1[1]),0,1);
-//    } else {
-//       r1r = (n-r1[0])/(r1[1]-r1[0]);
-//    }
-//    if(r2[2] && r2[0]>r2[1]) {
-//       r2r = (r1r*(r2[2]-r2[0]+r2[1]))+r2[0];
-//       return r2r>r2[2]?r2r-r2[2]:r2r;
-//    } else {
-//       return (r1r*(r2[1]-r2[0]))+r2[0];
-//    }
-// }
-
-
-// function loopRangeRatio(n,r1,r2) {
-//    if(r1[2] && r1[0]<0) {
-//       var r1p = partof(n<=r1[1]?n+r1[2]:n, r1[0], r1[0]+(r1[2]-r1[0]+r1[1]);
-//    } else var r1p = partof(n, r1[0], r1[1]);
-//    if(r2[2] && r2[0]<0) {
-//       var r2p = toward(r1p, r2[2], r2[0]+r2[1], r2[0]);
-//       var r = r2p>r2[2]?r2p-r2[2]:r2p;
-//    } else var r = toward(r1p, r2[0], r2[1]);
-//    return r;
-// }
 
 
 /* DEPRECATED */
 var numberToward = (n,x,p) => ((x-n)*p)+n;
 var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
    
-
-/* Round number n to nearest number x */
-function roundTo(n,x){
-   if(x<1){var m=(""+x).split(".");var m2=Math.pow(10,m[1].length);n*=m2;x*=m2;}
-   var r=x*Math.round(n/x);
-   return m2?r/m2:r;
-}
 
 
 
