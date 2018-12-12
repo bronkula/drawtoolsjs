@@ -98,7 +98,7 @@ const pathmaker = {
 }
 const makePath(ctx,paths) {
    pathmaker.start(ctx);
-   for(var i in paths) pathmaker[paths[i].splice(0,1,ctx)[0]].apply(null,paths[i]);
+   for(let i in paths) pathmaker[paths[i].splice(0,1,ctx)[0]].apply(null,paths[i]);
    pathmaker.end(ctx);
 }
 
@@ -168,18 +168,16 @@ var drawMyImage = drawableImage("imageurl.jpg");
 drawMyImage(ctx,10,10,50,50);
 */
 const drawableImage = url => {
-  var loaded = false;
-  var i = new Image();
-  i.onload = function(){
-    loaded = true;
-  }
+  let loaded = false;
+  let i = new Image();
+  i.onload = ()=> loaded=true;
   i.src = url;
 
-  var drawI = function(ctx,x,y,w,h){
-    console.log(i)
+  const drawI = function(ctx,x,y,w,h){
+//     console.log(i)
     if(!loaded) setTimeout(drawI,10);
     else {
-      console.log(arguments)
+//       console.log(arguments)
       ctx.drawImage(i,x,y,w,h);
     }
   }
@@ -188,9 +186,8 @@ const drawableImage = url => {
 
 /* Draw text */
 const drawText = (ctx,text,x,y,options) => {
-   ctx = overRide(ctx,options);
-   if(options.lineWidth) ctx.strokeText(text,x,y);
-   if(options.fillStyle) ctx.fillText(text,x,y);
+   if(options.lineWidth) overRide(ctx,options).strokeText(text,x,y);
+   if(options.fillStyle) overRide(ctx,options).fillText(text,x,y);
 }
 /* Draw text, replacing new lines characters with visible line breaks */
 const drawParagraph = (ctx,text,x,y,lineHeight,options) => {
@@ -237,7 +234,7 @@ position: [x,y,w,h]
 */
 const drawGradient = (ctx,direction,stops,position) => {
   var grd=ctx.createLinearGradient.apply(ctx,direction);
-  for(var i in stops) {
+  for(let i in stops) {
     grd.addColorStop.apply(grd,stops[i]);
   }
   ctx.fillStyle=grd;
@@ -249,7 +246,7 @@ const drawGradient = (ctx,direction,stops,position) => {
 /* draw a series of circle at x y coordinates */
 const drawPoints = (ctx,line,radius,options) => {
    pathmaker.start(ctx);
-   for(var i in line) {
+   for(let i in line) {
       pathmaker.circle(ctx,line[i].x,line[i].y,radius);
    }
    pathmaker.end(ctx);
@@ -260,14 +257,14 @@ const drawPoints = (ctx,line,radius,options) => {
 const drawGrid = (ctx,rows,cols,x,y,w,h,options) => {
    pathmaker.start(ctx);
    // Draw the rows
-   for(var i=0;i<=rows;i++) {
+   for(let i=0;i<=rows;i++) {
       pathmaker.points(ctx,[
          {x:x,y:(h*(i/rows))+y},
          {x:x+w,y:(h*(i/rows))+y}
          ]);
    }
    // Draw the columns
-   for(var i=0;i<=cols;i++) {
+   for(let i=0;i<=cols;i++) {
       pathmaker.points(ctx,[
          {x:(w*(i/cols))+x,y:y},
          {x:(w*(i/cols))+x,y:y+h}
@@ -336,7 +333,7 @@ const drawImageTSR = (ctx,img,x,y,w,h,sx,sy,r) => {
 
 /* This function will store a canvas into an image */
 const storeImage = (cvs,w,h) => { 
-  var i = new Image();
+  let i = new Image();
   i.src = cvs.toDataURL();
   return i;
 }
