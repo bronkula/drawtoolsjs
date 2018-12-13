@@ -1,192 +1,349 @@
 /*
- * Draw Tools v1.32
- * 2018/04/26
+ * Draw.js
  * Creator: Hamilton Cline
  * Email: hamdiggy@gmail.com
  * Website: hamiltondraws.com
+ * Version 1.4.0
+ * 2018-12-13
+ * https://github.com/bronkula/drawtoolsjs
 */
 
 
 
 
 
-/*---------------------- Math Helper Functions -----------------------------*/
-
-/* Turn degrees into Radians, necessary for circle math */
-var degreesToRadians = (num) => (num * Math.PI)/180;
-   
-/* Turn Radians into Degrees, necessary for circle math */
-var radiansToDegrees = (num) => (num * 180)/Math.PI;
-   
-/* Get a positional offset for x or y useful for placing something on an arc around point */
-var getSatellite = (start,angle,distance,isX) => start+Math[isX?"cos":"sin"](degreesToRadians(angle))*distance;
-   
-/* Returns the angle from two points */
-function angleFromPoints(x1,y1,x2,y2,inRadians){
-   var angleRadians = Math.atan2(y2 - y1, x2 - x1);
-   return inRadians?angleRadians:radiansToDegrees(angleRadians);
-}
-// Will return the angle opposite of the B side
-var angleFromSides = (a,b,c) => Math.acos((c*c+a*a-b*b)/(2*c*a));
-   
-/* Returns a 0,360 degree angle from a -180,180 degree angle */
-var trueAngle = (a) => a<0?360+a:a;
-   
-/* A random number between n and x */
-var rand = (n,x) => Math.round(Math.random()*(x-n))+n;
-   
-/* Make sure a number does not passbelow a min or above a max */
-var clamp = (a,min,max) => Math.min(Math.max(a,min),max);
-   
-/* Make sure a number does not go beyond a min or max, and wrap around to the other side instead */
-var clampWrap = (a,min,max) => a>max?min:a<min?max:a;
-/* Return a number between one number and another: Min, Max, Percentage */
-var numberToward = (n,x,p) => ((x-n)*p)+n;
-
-/* Returns an x y object */
-function xy(x,y){
-    this.x = x;
-    this.y = y;
-}
-/* Absolute number */
-var abs = (a) => a < 0 ? -a : a;
-
-/* Vector cross product. This shit is magic */
-var vxs = (x0,y0,x1,y1) => (x0*y1) - (x1*y0);
-   
-/* If p(osition) is outside of n or x, return a reversed s(peed) */
-function bounce(p,s,n,x) {
-  return (p>=x||p<=n)?-s:s;
-}
-/* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
-function overRide(o1,o2) {
-   if(!o2) return o1;
-   for(var i in o2) {
-      if(o2.hasOwnProperty(i) === false) continue;
-      o1[i] = o2[i];
-   }
-   return o1;
-}
-/* This function returns a number from one range transposed into another range */
-/* eg: rangeRatio(5,1,7,35,72) would result in 59.66. 5 inside of 1-7 is equal to 59.66 inside of 35-72. */
-var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
-   
-/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
-var simpleRatio = (nmin,nmax,omax) => nmin/nmax*omax;
-
-/* Round number n to nearest number x */
-function roundTo(n,x){
-   if(x<1){var m=(""+x).split(".");var m2=Math.pow(10,m[1].length);n*=m2;x*=m2;}
-   var r=x*Math.round(n/x);
-   return m2?r/m2:r;
-}
 
 
 
 
 
-/*------------------------ Positional Functions ------------------------------------*/
-/* The distance between two points */
-function pointDistance(x1,y1,x2,y2) {
-    var dx = x1 - x2;
-    var dy = y1 - y2;
-    return distance = Math.sqrt(dx * dx + dy * dy);
-}
-/* Return a point between one point and another: Position1, Position2, Percentage */
-function positionToward(x1,y1,x2,y2,p) {
-  return {x:numberToward(x1,x2,p),y:numberToward(y1,y2,p)};
-}
-/* Expects an XY object, an angle, and a distance. Returns an XY object */
-function getSatelliteXY(pos,angle,distance) {
-   return {
-      x:getSatellite(pos.x,angle,distance,true),
-      y:getSatellite(pos.y,angle,distance,false)
-   };
-}
-/* check if two number ranges overlap */
-function overlap(a0,a1,b0,b1){
-    return Math.min(a0,a1) <= Math.max(b0,b1) && Math.min(b0,b1) <= Math.max(a0,a1);
-}
-/* check if two boxes overlap */
-function intersectBox(x0,y0,x1,y1,x2,y2,x3,y3) {
-    return overlap(x0,x1,x2,x3) && overlap(y0,y1,y2,y3);
-}
-/* determine which side of a line a point is on */
-function pointSide(px,py,x0,y0,x1,y1) {
-    return vxs(x1-x0,y1-y0,px-x0,py-y0);
-}
-/* Intersect: Calculate the point of intersection between two lines. */
-function intersect(x0,y0,x1,y1,x2,y2,x3,y3) {
-    return new xy(
-    vxs(vxs(x0,y0,x1,y1),x0-x1,vxs(x2,y2,x3,y3),x2-x3) /
-    vxs(x0-x1,y0-y1,x2-x3,y2-y3), 
-    vxs(vxs(x0,y0,x1,y1),y0-y1,vxs(x2,y2,x3,y3),y2-y3) /
-    vxs(x0-x1,y0-y1,x2-x3,y2-y3)
-    );
-}
-/* Calculate if two lines intersect */
-function isIntersect(x0,y0,x1,y1,x2,y2,x3,y3) {
-    return IntersectBox(x0,y0,x1,y1, x2,y2,x3,y3)
-        && abs(PointSide(x2,y2,x0,y0,x1,y1) + PointSide(x3,y3,x0,y0,x1,y1)) != 2
-        && abs(PointSide(x0,y0,x2,y2,x3,y3) + PointSide(x1,y1,x2,y2,x3,y3)) != 2;
-}
-/* Detect if a point is in a rectangle */
-function pointInRect(px,py,x1,y1,x2,y2){
-   return px >= x1 && px <= x2 && py >= y1 && py <= y2;
-}
-/* Detect if a rectangle is fully within another rectangle */
-function rectInRect(x0,y0,x1,y1,x2,y2,x3,y3) {
-   return pointInRect(x0,y0,x2,y2,x3,y3) && pointInRect(x1,y1,x2,y2,x3,y3);
-}
-/* detect if a circle is touching another circle. Use 0 for r1 if a point */
-function detectCircleCollission(x1,y1,r1,x2,y2,r2) {
-    var dx = x1 - x2;
-    var dy = y1 - y2;
-    var distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance < r1 + r2) return true;
-    else return false;
-}
+/*
+Context options to remember
+fillStyle:"#fff"
+strokeStyle:"#000"
+lineWidth:number
+lineJoin:"round|bevel|miter"
+lineCap:"round|butt|square"
+font:"16px verdana"
+textAlign:"center|left|right"
+textBaseline:"top|middle|bottom|alphabetic|hanging"
+globalAlpha:0-1
+globalCompositeOperation:"source-over|destination-out"
+*/
+/* CANVAS.JS */
+/*----------------------------------------------------------------------*/
+/*                         Path functions                               */
 
-
-
-
-/*------------------------------- Point Detection Functions -----------------------*/
-/* These Require jQuery Events */
-/* Determine if an event is a touch event */
-function isTouch(e) {
-   return e.type.substring(0,5) == "touch";
-}
-/* Return an array of either touches or a click */
-function ev(e){
-   if(isTouch(e)) {
-      if(!e.originalEvent.touches.length) return e.originalEvent.changedTouches;
-      else return e.originalEvent.touches;
-   } else {
-      return [e];
+const pathmaker = {
+   start(ctx){
+      ctx.beginPath();
+   },
+   end(ctx){
+      ctx.closePath();
+   },
+   points(ctx,pts){
+      if(pts.length<2) return false;
+      ctx.moveTo(pts[0].x,pts[0].y);
+      for(let i in pts) {
+         ctx.lineTo(pts[i].x,pts[i].y);
+      }
+   },
+   polygon(ctx,x,y,r,a,s){
+     let eachangle = 360/s;
+     let line = [];
+     for(let i=0;i<=s;i++) {
+       line.push(getSatelliteXY({x,y},a+(eachangle*i),r));
+     }
+     pathmaker.points(ctx,line);
+   },
+   circle(ctx,x,y,r,a1,a2,a3){
+      pathmaker.arc(ctx,x,y,r,
+        a1!==undefined?a1:0,
+        a2!==undefined?a2:2*Math.PI,
+        a3!==undefined?a3:undefined);
+   },
+   arc(ctx,x,y,r,a1,a2,a3){
+      ctx.arc(x,y,r,a1,a2,a3);
+   },
+   rect(ctx,x,y,w,h){
+      pathmaker.points(ctx,[
+         {x:x,y:y},
+         {x:x+w,y:y},
+         {x:x+w,y:y+h},
+         {x:x,y:y+h},
+         {x:x,y:y}
+      ]);
+   },
+   pie(ctx,x,y,or,ir,sa,ea,ad){
+      pathmaker.arc(ctx,x,y,or, sa, ea+sa, !ad);
+      pathmaker.arc(ctx,x,y,ir, ea+sa, sa, ad);
+   },
+   roundRect(ctx,x,y,w,h,r){
+      if (typeof r === 'undefined') r = 0;
+      else if (typeof r === 'number') {
+         r = {tl: r, tr: r, br: r, bl: r};
+      } else {
+         r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
+      }
+      ctx.moveTo(x + r.tl, y);
+      ctx.lineTo(x + w - r.tr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+      ctx.lineTo(x + w, y + h - r.br);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+      ctx.lineTo(x + r.bl, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+      ctx.lineTo(x, y + r.tl);
+      ctx.quadraticCurveTo(x, y, x + r.tl, y);
    }
 }
-/* return an offset xy object for the position of the click or touch in the object */
-/* pass in an optional object that will be used for basis */
-function getEXY(e,o) {
-   var offs = $(o||e.target).offset();
-   x = e.pageX - offs.left;
-   y = e.pageY - offs.top;
-   var ratio = ratio===undefined?1:ratio;
-   return {x:ratio*x,y:ratio*y};
-}
-/* Return the first xy position from an event, whether touch or click */
-function getEventXY(e,o){
-   return getEXY(ev(e)[0],o);
+const makePath = (ctx,paths) => {
+   pathmaker.start(ctx);
+   for(let i in paths) pathmaker[paths[i].splice(0,1,ctx)[0]].apply(null,paths[i]);
+   pathmaker.end(ctx);
 }
 
 
+/*----------------------------------------------------------------------*/
+/*                         Draw functions                               */
+
+/* Stroke path */
+const strokeIt = (ctx,options) => {
+   if(!options) return;
+   if(options.lineWidth) overRide(ctx,options).stroke();
+}
+/* Fill a path */
+const fillIt = (ctx,options) =>{
+   if(!options) return;
+   if(options.fillStyle) overRide(ctx,options).fill();
+}
+
+
+/* Draw a circle */
+const drawCircle = (ctx,x,y,r,options) => {
+   makePath(ctx,[["circle",x,y,r]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
+}
+/* Draw a rectangle: x,y, width, height */
+const drawRect = (ctx,x,y,w,h,options) => {
+   makePath(ctx,[["rect",x,y,w,h]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
+}
+/* Draw a Polygon: x,y, radius, start angle, sides */
+const drawPolygon = drawShape = (ctx,x,y,r,a,s,options) => {
+   makePath(ctx,[["polygon",x,y,r,a,s]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
+}
+/* Draw a rectangle with a random color, using the rand helper function */
+const drawRandomRect = (ctx,x,y,w,h,options) => {
+   options.fillStyle = "rgba("+
+      rand(120,250)+","+
+      rand(120,250)+","+
+      rand(120,250)+","+
+      (options&&options.opacity!==undefined?options.opacity:0.7)+
+      ")";
+   drawRect(ctx,x,y,w,h,options);
+}
+/* Draw one line segment */
+const drawSegment = (ctx,x1,y1,x2,y2,options) => {
+   makePath(ctx,[["points",[
+      {x:x1,y:y1},
+      {x:x2,y:y2}
+      ]]]);
+   strokeIt(ctx,options);
+}
+/* Draw an array of line segments, allowing smooth connections */
+const drawLine = (ctx,line,options) => {
+   makePath(ctx,[["points",line]]);
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
+}
+
+/* Create a curryed function which preloads an image to be placed onto canvas */
+/*
+example:
+var drawMyImage = drawableImage("imageurl.jpg");
+drawMyImage(ctx,10,10,50,50);
+*/
+const drawableImage = url => {
+  let loaded = false;
+  let i = new Image();
+  i.onload = ()=> loaded=true;
+  i.src = url;
+
+  const drawI = function(ctx,x,y,w,h){
+//     console.log(i)
+    if(!loaded) setTimeout(drawI,10);
+    else {
+//       console.log(arguments)
+      ctx.drawImage(i,x,y,w,h);
+    }
+  }
+  return drawI;
+}
+
+/* Draw text */
+const drawText = (ctx,text,x,y,options) => {
+   if(options.lineWidth) overRide(ctx,options).strokeText(text,x,y);
+   if(options.fillStyle) overRide(ctx,options).fillText(text,x,y);
+}
+/* Draw text, replacing new lines characters with visible line breaks */
+const drawParagraph = (ctx,text,x,y,lineHeight,options) => {
+  var ps = text.split(/\n/);
+  for(var i in ps) {
+    drawText(ctx,ps[i],x,y+(lineHeight*i),options);
+  }
+}
+/* Draw text with a cut out stroke */
+const drawLabel = (ctx,text,x,y,options) => {
+   ctx = overRide(ctx,options);
+   ctx.globalCompositeOperation = "destination-out";
+   ctx.strokeText(text,x,y);
+   ctx.globalCompositeOperation = "source-over";
+   ctx.fillText(text,x,y);
+}
+
+/* Draw a circle with a cutout circle */
+const drawPulse = (ctx,x,y,outerRadius,innerRadius,options) => {
+   drawCircle(ctx,x,y,outerRadius,options);
+   ctx.globalCompositeOperation = "destination-out";
+   drawCircle(ctx,x,y,innerRadius,options);
+   ctx.globalCompositeOperation = "source-over";
+}
+
+/* Draw a pie shape or donut pie shape */
+const drawPie = (ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options) => {
+   makePath(ctx,[["pie",x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
+   fillIt(ctx,options);
+   strokeIt(ctx,options);
+}
+
+// http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
+const drawRoundRect = (ctx, x, y, w, h, r, options) => {
+   makePath(ctx,[["roundRect",x, y, w, h, r]])
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
+}
+
+/* Draw a gradient
+direction: [x1,y1,x2,y2]
+stops: [[percent,color],[percent,color]]
+position: [x,y,w,h]
+*/
+const drawGradient = (ctx,direction,stops,position) => {
+  var grd=ctx.createLinearGradient.apply(ctx,direction);
+  for(let i in stops) {
+    grd.addColorStop.apply(grd,stops[i]);
+  }
+  ctx.fillStyle=grd;
+  ctx.fillRect.apply(ctx,position);
+}
+
+
+
+/* draw a series of circle at x y coordinates */
+const drawPoints = (ctx,line,radius,options) => {
+   pathmaker.start(ctx);
+   for(let i in line) {
+      pathmaker.circle(ctx,line[i].x,line[i].y,radius);
+   }
+   pathmaker.end(ctx);
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
+}
+/* draw a series of lines vertically and horizontally */
+const drawGrid = (ctx,rows,cols,x,y,w,h,options) => {
+   pathmaker.start(ctx);
+   // Draw the rows
+   for(let i=0;i<=rows;i++) {
+      pathmaker.points(ctx,[
+         {x:x,y:(h*(i/rows))+y},
+         {x:x+w,y:(h*(i/rows))+y}
+         ]);
+   }
+   // Draw the columns
+   for(let i=0;i<=cols;i++) {
+      pathmaker.points(ctx,[
+         {x:(w*(i/cols))+x,y:y},
+         {x:(w*(i/cols))+x,y:y+h}
+         ]);
+   }
+   pathmaker.end(ctx);
+   strokeIt(ctx,options);
+   fillIt(ctx,options);
+}
+/* Draw a grid, a line, and a series of points */
+const drawLineGraph = (ctx,line,x,y,w,h) => {
+   drawGrid(ctx,3,5,x,y,w,h,{
+      strokeStyle:"#ddd",
+      lineWidth:2,
+      lineJoin:"round",
+      lineCap:"round"
+   })
+   drawLine(ctx,line,{
+      strokeStyle:"black",
+      lineWidth:6,
+      lineJoin:"round",
+      lineCap:"round"
+   });
+   drawPoints(ctx,line,6,{
+      fillStyle:"white",
+      strokeStyle:"black",
+      lineWidth:4
+   })
+}
+
+
+// http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
+const rotateAndDo = ( ctx, angleInRad , positionX, positionY, callback) => {
+   ctx.translate( positionX, positionY );
+   ctx.rotate( angleInRad );
+   callback();
+   ctx.rotate( -angleInRad );
+   ctx.translate( -positionX, -positionY );
+}
+/* This function does three operations, and saves first */
+const translateScaleRotate = (ctx,x,y,sx,sy,r,fn) => {
+  ctx.save();
+   ctx.translate(x,y);
+   ctx.scale(sx,sy);
+   ctx.rotate(r);
+   fn();
+  ctx.restore();
+}
+/* This function will Translate and then Scale, and saves first */
+const translateScale = (ctx,x,y,sx,sy,fn) => {
+  ctx.save();
+   ctx.translate(x,y);
+   ctx.scale(sx,sy);
+   fn();
+  ctx.restore();
+}
+/* Translate, Scale, Rotate, then draw an image */
+const drawImageTSR = (ctx,img,x,y,w,h,sx,sy,r) => {
+  translateScaleRotate(ctx,x,y,sx,sy,r,function(){
+    ctx.drawImage(img,-w*0.5,-h*0.5,w,h);
+  });
+}
+
+
+
+
+/* This function will store a canvas into an image */
+const storeImage = (cvs,w,h) => { 
+  let i = new Image();
+  i.src = cvs.toDataURL();
+  return i;
+}
 
 
 
 
 
-
+/* COLORS.JS */
 function RGB(r,g,b) {
     this.r = +r;
     this.g = +g;
@@ -400,10 +557,10 @@ COLOR.hslReg = /^hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[,\d\.]*\)/;
         return this;
     };
     COLOR.prototype.hexToRgb = function() {
-         this.rgb.r = parseInt(this.hex.substr(0,2),16);
-         this.rgb.g = parseInt(this.hex.substr(2,2),16);
-         this.rgb.b = parseInt(this.hex.substr(4,2),16);
-         return this;
+        this.rgb.r = parseInt(this.hex.substr(0,2),16);
+        this.rgb.g = parseInt(this.hex.substr(2,2),16);
+        this.rgb.b = parseInt(this.hex.substr(4,2),16);
+        return this;
     };
     COLOR.prototype.toString = function(type,alpha) {
         switch(type) {
@@ -420,357 +577,149 @@ COLOR.hslReg = /^hsla?\((\d+),\s*(\d+)%,\s*(\d+)%[,\d\.]*\)/;
 
 
 
+/* EVENTS.JS */
+/*------------------------------- Point Detection Functions -----------------------*/
+/* Return an array of either touches or a click */
+const evPoints = e =>
+   e.type.substring(0,5)!="touch"?
+      [e]:
+      !e.originalEvent.touches.length?
+         e.originalEvent.changedTouches:
+         e.originalEvent.touches;
+/* return an offset xy object for the position of the click or touch in the object */
+/* pass in an optional object that will be used for basis */
+const getEXY = (e,o) => ({
+   x:e.pageX-(o||e.target).offsetLeft,
+   y:e.pageY-(o||e.target).offsetTop
+});
+/* Return the first xy position from an event, whether touch or click */
+const getEventXY = (e,o) => getEXY(evPoints(e)[0],o);
 
 
 
+/* MATHS.JS */
+/*---------------------- Math Helper Functions -----------------------------*/
 
-/* This library requires the Maths.js library for a number of its functions */
+/* Turn degrees into Radians, necessary for circle math */
+const degreesToRadians = a => a*Math.PI/180;
+   
+/* Turn Radians into Degrees, necessary for circle math */
+const radiansToDegrees = a => a*180/Math.PI;
+   
+/* Returns the angle from two points */
+const angleFromPoints = (x1,y1,x2,y2) => Math.atan2(y2 - y1, x2 - x1);
 
-/*
-Context options to remember
-fillStyle:"#fff"
-strokeStyle:"#000"
-lineWidth:number
-lineJoin:"round|bevel|miter"
-lineCap:"round|butt|square"
-font:"16px verdana"
-textAlign:"center|left|right"
-textBaseline:"top|middle|bottom|alphabetic|hanging"
-globalAlpha:0-1
-globalCompositeOperation:"source-over|destination-out"
-*/
-
-
-
+// Will return the angle opposite of the B side
+const angleFromSides = (a,b,c) => Math.acos((c*c+a*a-b*b)/(2*c*a));
+   
+/* A random number between n and x */
+const rand = (n,x) => Math.round(Math.random()*(x-n))+n;
 
 
 
+/* Returns an x y object from x y values */
+const xy = (x,y) => ({x,y});
 
+/* Vector cross product. This shit is magic */
+const vxs = (x0,y0,x1,y1) => (x0*y1) - (x1*y0);
+   
+/* If p(osition) is outside of n or x, return a reversed s(peed) */
+const bounce = (p,s,n,x) => p>=x||p<=n?-s:s;
 
+const bounceXY = (a,y) => y?-a:a-(Math.abs(a)<90?90:-90);
 
+/* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
+const overRide = (o1,o2) => !o2?o1:Object.assign(o1,o2);
 
-/*----------------------------------------------------------------------*/
-/*                         Path functions                               */
+/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
+const ratio = (min,max) => n => n*min/max;
 
-var pathmaker = {
-   start:function(ctx){
-      ctx.beginPath();
-   },
-   end:function(ctx){
-      ctx.closePath();
-   },
-   points:function(ctx,pts){
-      if(pts.length<2) return false;
-      ctx.moveTo(pts[0].x,pts[0].y);
-      for(var i in pts) {
-         ctx.lineTo(pts[i].x,pts[i].y);
-      }
-   },
-   polygon:function(ctx,x,y,r,a,s){
-     var eachangle = 360/s;
-     var line = [];
-     for(var i=0;i<=s;i++) {
-       line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
-     }
-     pathmaker.points(ctx,line);
-   },
-   circle:function(ctx,x,y,r,a1,a2,a3){
-      pathmaker.arc(ctx,x,y,r,
-        a1!==undefined?a1:0,
-        a2!==undefined?a2:2*Math.PI,
-        a3!==undefined?a3:undefined);
-   },
-   arc:function(ctx,x,y,r,a1,a2,a3){
-      ctx.arc(x,y,r,a1,a2,a3);
-   },
-   rect:function(ctx,x,y,w,h){
-      pathmaker.points(ctx,[
-         {x:x,y:y},
-         {x:x+w,y:y},
-         {x:x+w,y:y+h},
-         {x:x,y:y+h},
-         {x:x,y:y}
-      ]);
-   },
-   pie:function(ctx,x,y,or,ir,sa,ea,ad){
-      sa = degreesToRadians(sa);
-      ea = sa + degreesToRadians(ea);
-      pathmaker.arc(ctx,x,y,or, sa, ea, !ad);
-      pathmaker.arc(ctx,x,y,ir, ea, sa, ad);
-   },
-   roundRect:function(ctx,x,y,w,h,r){
-      if (typeof r === 'undefined') r = 0;
-      if (typeof r === 'number') {
-         r = {tl: r, tr: r, br: r, bl: r};
-      } else {
-         r = overRide({tl: 0, tr: 0, br: 0, bl: 0},r);
-      }
-      ctx.moveTo(x + r.tl, y);
-      ctx.lineTo(x + w - r.tr, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
-      ctx.lineTo(x + w, y + h - r.br);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
-      ctx.lineTo(x + r.bl, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
-      ctx.lineTo(x, y + r.tl);
-      ctx.quadraticCurveTo(x, y, x + r.tl, y);
-   }
-}
-function makePath(ctx,paths) {
-   pathmaker.start(ctx);
-   var type;
-   for(var i in paths) {
-      type = paths[i].splice(0,1,ctx)[0];
-      pathmaker[type].apply(null,paths[i]);
-   }
-   pathmaker.end(ctx);
-}
+/* Nudge a number a certain percentage of a distance using a starting offset */
+const nudge = (s,p,d) => p*d+s;
 
+/* Make sure a number does not passbelow a min or above a max */
+const clamp = (min,max) => n => n>max?max:n<min?min:n;
 
-/*----------------------------------------------------------------------*/
-/*                         Draw functions                               */
+/* Given a curried max value, attempts to bring negative numbers to positive range of loop */
+const trueNumber = max => n => n<0?n+max:n;
+   const trueRadian = trueNumber(Math.PI*2);
+   const trueAngle = trueNumber(360);
 
-/* Stroke path */
-function strokeIt(ctx,options) {
-   if(!options) return;
-   if(options.lineWidth) {
-      ctx = overRide(ctx,options);
-      ctx.stroke();
-   }
-}
-/* Fill a path */
-function fillIt(ctx,options){
-   if(!options) return;
-   if(options.fillStyle) {
-      ctx = overRide(ctx,options);
-      ctx.fill();
-   }
-}
+/* Given a curried max value, attempts to wrap a number over half into a negative number of loop */
+const signNumber = max => n => n>max*0.5?n%max-max:n;
+   const signRadian = signNumber(Math.PI*2);
+   const signAngle = signNumber(360);
 
-
-/* Draw a circle */
-function drawCircle(ctx,x,y,r,options){
-   makePath(ctx,[["circle",x,y,r]]);
-   fillIt(ctx,options);
-   strokeIt(ctx,options);
-}
-/* Draw a rectangle: x,y, width, height */
-function drawRect(ctx,x,y,w,h,options){
-   ctx = overRide(ctx,options);
-   makePath(ctx,[["rect",x,y,w,h]]);
-   fillIt(ctx,options);
-   strokeIt(ctx,options);
-}
-/* Draw a Polygon: x,y, radius, start angle, sides */
-function drawPolygon(ctx,x,y,r,a,s,options){
-   ctx = overRide(ctx,options);
-   makePath(ctx,[["polygon",x,y,r,a,s]]);
-   fillIt(ctx,options);
-   strokeIt(ctx,options);
-}
-/* Draw a rectangle with a random color, using the rand helper function */
-function drawRandomRect(ctx,x,y,w,h,options){
-   options.fillStyle = "rgba("+
-      rand(120,250)+","+
-      rand(120,250)+","+
-      rand(120,250)+","+
-      (options&&options.opacity!==undefined?options.opacity:0.7)+
-      ")";
-   drawRect(ctx,x,y,w,h,options);
-}
-/* Draw one line segment */
-function drawSegment(ctx,x1,y1,x2,y2,options){
-   makePath(ctx,[["points",[
-      {x:x1,y:y1},
-      {x:x2,y:y2}
-      ]]]);
-   strokeIt(ctx,options);
-}
-/* Draw an array of line segments, allowing smooth connections */
-function drawLine(ctx,line,options){
-   makePath(ctx,[["points",line]]);
-   strokeIt(ctx,options);
-   fillIt(ctx,options);
-}
-/* Draw a shape with any number of sides */
-function drawShape(ctx,x,y,r,a,s,options){
-  var eachangle = 360/s;
-  var line = [];
-  for(var i=0;i<=s;i++) {
-    line.push(getSatelliteXY({x:x,y:y},a+(eachangle*i),r));
-  }
-  makePath(ctx,[["points",line]]);
-  strokeIt(ctx,options);
-  fillIt(ctx,options);
-}
-
-/* Draw text */
-function drawText(ctx,text,x,y,options){
-   ctx = overRide(ctx,options);
-   if(options.lineWidth) ctx.strokeText(text,x,y);
-   if(options.fillStyle) ctx.fillText(text,x,y);
-}
-/* Draw text, replacing new lines characters with visible line breaks */
-function drawParagraph(ctx,text,x,y,lineHeight,options) {
-  var ps = text.split(/\n/);
-  for(var i in ps) {
-    drawText(ctx,ps[i],x,y+(lineHeight*i),options);
-  }
-}
-/* Draw text with a cut out stroke */
-function drawLabel(ctx,text,x,y,options){
-   ctx = overRide(ctx,options);
-   ctx.globalCompositeOperation = "destination-out";
-   ctx.strokeText(text,x,y);
-   ctx.globalCompositeOperation = "source-over";
-   ctx.fillText(text,x,y);
-}
-
-/* Draw a circle with a cutout circle */
-function drawPulse(ctx,x,y,outerRadius,innerRadius,options){
-   drawCircle(ctx,x,y,outerRadius,options);
-   ctx.globalCompositeOperation = "destination-out";
-   drawCircle(ctx,x,y,innerRadius,options);
-   ctx.globalCompositeOperation = "source-over";
-}
-
-/* Draw a pie shape or donut pie shape */
-function drawPie(ctx,x,y,outerRadius,innerRadius,startangle,endangle,additive,options){
-   makePath(ctx,[["pie",x,y,outerRadius,innerRadius,startangle,endangle,additive]]);
-   fillIt(ctx,options);
-   strokeIt(ctx,options);
-}
-
-// http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
-function drawRoundRect(ctx, x, y, w, h, r, options) {
-   makePath(ctx,[["roundRect",x, y, w, h, r]])
-   strokeIt(ctx,options);
-   fillIt(ctx,options);
-}
-
-
-
-/* Create a curryed function which preloads an image to be placed onto canvas */
-/*
+/* This function returns an arbitrary positive number looped inside an arbitrary positive number range */
+const within = (min,max) => n => trueNumber(max-min)((n-min)%(max-min))+min;
+   const withinCircle = within(0,360);
+   
+/* This function returns the percentage of an arbitrary number mapped to an arbitrary number range */
+const partof = (min,max) => n => (n-min)/(max-min);
+   const partofCircle = partof(0,360);
+   
+/* This function returns a number from an arbitrary number range using a percentage. Optional offset value.
 example:
-var drawMyImage = drawableImage("imageurl.jpg");
-drawMyImage(ctx,10,10,50,50);
+toward(10,20)(0.5) > 15
 */
-function drawableImage(url){
-  var loaded = false;
-  var i = new Image();
-  i.onload = function(){
-    loaded = true;
-  }
-  i.src = url;
+const toward = (min,max,o=false) => n => n*(max-min)+(o||min);
+/* This function maps a number from one arbitrary range onto another arbitrary range.
+example:
+mapRange(5,0,10,0,360) > 180*/
+const mapRange = (n,min1,max1,min2,max2) => toward(min2,max2)(partof(min1,max1)(n));
 
-  var drawI = function(ctx,x,y,w,h){
-    console.log(i)
-    if(!loaded) setTimeout(drawI,10);
-    else {
-      console.log(arguments)
-      ctx.drawImage(i,x,y,w,h);
-    }
-  }
-  return drawI;
+/* Round number n to nearest number x */
+const roundTo = (n,x) => {
+   if(x<1){var m=(""+x).split(".");var m2=Math.pow(10,m[1].length);n*=m2;x*=m2;}
+   let r=x*Math.round(n/x);
+   return m2?r/m2:r;
 }
-
-/* Draw a gradient
-direction: [x1,y1,x2,y2]
-stops: [[percent,color],[percent,color]]
-position: [x,y,w,h]
-*/
-function drawGradient(ctx,direction,stops,position) {
-  var grd=ctx.createLinearGradient.apply(ctx,direction);
-  for(var i in stops) {
-    grd.addColorStop.apply(grd,stops[i]);
-  }
-  ctx.fillStyle=grd;
-  ctx.fillRect.apply(ctx,position);
-}
+   
 
 
-/* draw a series of circle at x y coordinates */
-function drawPoints(ctx,line,radius,options) {
-   pathmaker.start(ctx);
-   for(var i in line) {
-      pathmaker.circle(ctx,line[i].x,line[i].y,radius);
-   }
-   pathmaker.end(ctx);
-   strokeIt(ctx,options);
-   fillIt(ctx,options);
-}
-/* draw a series of lines vertically and horizontally */
-function drawGrid(ctx,rows,cols,x,y,w,h,options) {
-   pathmaker.start(ctx);
-   // Draw the rows
-   for(var i=0;i<=rows;i++) {
-      pathmaker.points(ctx,[
-         {x:x,y:(h*(i/rows))+y},
-         {x:x+w,y:(h*(i/rows))+y}
-         ]);
-   }
-   // Draw the columns
-   for(var i=0;i<=cols;i++) {
-      pathmaker.points(ctx,[
-         {x:(w*(i/cols))+x,y:y},
-         {x:(w*(i/cols))+x,y:y+h}
-         ]);
-   }
-   pathmaker.end(ctx);
-   strokeIt(ctx,options);
-   fillIt(ctx,options);
-}
-/* Draw a grid, a line, and a series of points */
-function drawLineGraph(ctx,line,x,y,w,h){
-   drawGrid(ctx,3,5,x,y,w,h,{
-      strokeStyle:"#ddd",
-      lineWidth:2,
-      lineJoin:"round",
-      lineCap:"round"
-   })
-   drawLine(ctx,line,{
-      strokeStyle:"black",
-      lineWidth:6,
-      lineJoin:"round",
-      lineCap:"round"
-   });
-   drawPoints(ctx,line,6,{
-      fillStyle:"white",
-      strokeStyle:"black",
-      lineWidth:4
-   })
-}
 
 
-// http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
-function rotateAndDo ( ctx, angleInRad , positionX, positionY, callback) {
-   ctx.translate( positionX, positionY );
-   ctx.rotate( angleInRad );
-   callback();
-   ctx.rotate( -angleInRad );
-   ctx.translate( -positionX, -positionY );
+
+/*------------------------ Positional Functions ------------------------------------*/
+/* The distance between two points */
+const pointDistance = (x1,y1,x2,y2) => Math.sqrt((x1-x2)**2 + (y1-y2)**2);
+
+/* Return a point between one point and another: Position1, Position2, Percentage */
+const positionToward = (x1,y1,x2,y2,p) => xy(toward(x1,x2)(p),toward(y1,y2)(p));
+
+/* Expects an X and a Y, an angle, and a distance. Returns an XY object */
+const getSatelliteXY = (x,y,a,d) => xy(x+Math.cos(a)*d,y+Math.sin(a)*d);
+
+/* check if two number ranges overlap */
+const overlap = (a1,a2,b1,b2) => Math.min(a1,a2) <= Math.max(b1,b2) && Math.min(b1,b2) <= Math.max(a1,a2);
+
+/* check if two boxes overlap */
+const intersectBox = (x0,y0,x1,y1,x2,y2,x3,y3) => overlap(x0,x1,x2,x3) && overlap(y0,y1,y2,y3);
+
+/* determine which side of a line a point is on */
+const pointSide = (px,py,x0,y0,x1,y1) => vxs(x1-x0,y1-y0,px-x0,py-y0);
+
+/* Intersect: Calculate the point of intersection between two lines. */
+const intersect = (x0,y0,x1,y1,x2,y2,x3,y3) => xy(
+   vxs(vxs(x0,y0,x1,y1),x0-x1,vxs(x2,y2,x3,y3),x2-x3) / vxs(x0-x1,y0-y1,x2-x3,y2-y3),
+   vxs(vxs(x0,y0,x1,y1),y0-y1,vxs(x2,y2,x3,y3),y2-y3) / vxs(x0-x1,y0-y1,x2-x3,y2-y3)
+);
+
+/* Calculate if two lines intersect */
+const isIntersect = (x0,y0,x1,y1,x2,y2,x3,y3) => IntersectBox(x0,y0,x1,y1, x2,y2,x3,y3)
+   && Math.abs(PointSide(x2,y2,x0,y0,x1,y1) + PointSide(x3,y3,x0,y0,x1,y1)) != 2
+   && Math.abs(PointSide(x0,y0,x2,y2,x3,y3) + PointSide(x1,y1,x2,y2,x3,y3)) != 2;
+
+/* Detect if a point is in a rectangle */
+const pointInRect = (px,py,x1,y1,x2,y2) => px >= x1 && px <= x2 && py >= y1 && py <= y2;
+
+const pointInArc = (px,py,ax,ay,ir,or,as,ae) => {
+   var a = angleFromPoints(px,py,ax,ay);
+   var d = pointDistance(px,py,ax,ay);
+   return a>=as && a<=ae && d>=ir && d<=or;
 }
-/* This function does three operations, and saves first */
-function translateScaleRotate(ctx,x,y,sx,sy,r,fn) {
-  ctx.save();
-   ctx.translate(x,y);
-   ctx.scale(sx,sy);
-   ctx.rotate(r);
-   fn();
-  ctx.restore();
-}
-/* This function will Translate and then Scale, and saves first */
-function translateScale(ctx,x,y,sx,sy,fn) {
-  ctx.save();
-   ctx.translate(x,y);
-   ctx.scale(sx,sy);
-   fn();
-  ctx.restore();
-}
-/* Translate, Scale, Rotate, then draw an image */
-function drawImageTSR(ctx,img,x,y,w,h,sx,sy,r) {
-  translateScaleRotate(ctx,x,y,sx,sy,r,function(){
-    ctx.drawImage(img,-w*0.5,-h*0.5,w,h);
-  });
-}
+/* Detect if a rectangle is fully within another rectangle */
+const rectInRect = (x0,y0,x1,y1,x2,y2,x3,y3) => pointInRect(x0,y0,x2,y2,x3,y3) && pointInRect(x1,y1,x2,y2,x3,y3);
+
+/* detect if a circle is touching another circle. Use 0 for r1 if a point */
+const detectCircleCollission = (x1,y1,r1,x2,y2,r2) => pointDistance(x1,y1,x2,y2) < (r1 + r2);
