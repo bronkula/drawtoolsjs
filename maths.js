@@ -51,12 +51,12 @@ const clamp = (min,max) => n => n>max?max:n<min?min:n;
 
 /* Given a curried max value, attempts to bring negative numbers to positive range of loop */
 const trueNumber = max => n => n<0?n+max:n;
-   const trueRadian = trueNumber(Math.PI);
+   const trueRadian = trueNumber(Math.PI*2);
    const trueAngle = trueNumber(360);
 
 /* Given a curried max value, attempts to wrap a number over half into a negative number of loop */
 const signNumber = max => n => n>max*0.5?n%max-max:n;
-   const signRadian = signNumber(Math.PI);
+   const signRadian = signNumber(Math.PI*2);
    const signAngle = signNumber(360);
 
 /* This function returns an arbitrary positive number looped inside an arbitrary positive number range */
