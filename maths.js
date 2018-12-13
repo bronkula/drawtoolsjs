@@ -5,6 +5,27 @@
  * Website: hamiltondraws.com
 */
 
+/* EVENTS.JS */
+/*------------------------------- Point Detection Functions -----------------------*/
+/* Return an array of either touches or a click */
+const evPoints = e =>
+   e.type.substring(0,5)!="touch"?
+      [e]:
+      !e.originalEvent.touches.length?
+         e.originalEvent.changedTouches:
+         e.originalEvent.touches;
+/* return an offset xy object for the position of the click or touch in the object */
+/* pass in an optional object that will be used for basis */
+const getEXY = (e,o) => ({
+   x:e.pageX-(o||e.target).offsetLeft,
+   y:e.pageY-(o||e.target).offsetTop
+});
+/* Return the first xy position from an event, whether touch or click */
+const getEventXY = (e,o) => getEXY(evPoints(e)[0],o);
+
+
+
+/* MATHS.JS */
 /*---------------------- Math Helper Functions -----------------------------*/
 
 /* Turn degrees into Radians, necessary for circle math */
@@ -12,9 +33,6 @@ const degreesToRadians = a => a*Math.PI/180;
    
 /* Turn Radians into Degrees, necessary for circle math */
 const radiansToDegrees = a => a*180/Math.PI;
-   
-/* Get a sin or cos offset for angle a in radians, offset from position s by length d */
-const getSatellite = (s,a,d,x=false) => s+Math[x?"cos":"sin"](a)*d;
    
 /* Returns the angle from two points */
 const angleFromPoints = (x1,y1,x2,y2) => Math.atan2(y2 - y1, x2 - x1);
@@ -43,6 +61,9 @@ const overRide = (o1,o2) => !o2?o1:Object.assign(o1,o2);
 
 /* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
 const ratio = (min,max) => n => n*min/max;
+
+/* Nudge a number a certain percentage of a distance using a starting offset */
+const nudge = (s,p,d) => p*d+s;
 
 /* Make sure a number does not passbelow a min or above a max */
 const clamp = (min,max) => n => n>max?max:n<min?min:n;
@@ -81,12 +102,6 @@ const roundTo = (n,x) => {
    let r=x*Math.round(n/x);
    return m2?r/m2:r;
 }
-
-
-
-/* DEPRECATED */
-var numberToward = (n,x,p) => ((x-n)*p)+n;
-var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))+omin;
    
 
 
@@ -95,16 +110,13 @@ var rangeRatio = (n,nmin,nmax,omin,omax) => (((n-nmin)/(nmax-nmin))*(omax-omin))
 
 /*------------------------ Positional Functions ------------------------------------*/
 /* The distance between two points */
-const pointDistance = (x1,y1,x2,y2) => Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+const pointDistance = (x1,y1,x2,y2) => Math.sqrt((x1-x2)**2 + (y1-y2)**2);
 
 /* Return a point between one point and another: Position1, Position2, Percentage */
-const positionToward = (x1,y1,x2,y2,p) => {x:toward(x1,x2)(p),y:toward(y1,y2)(p)};
+const positionToward = (x1,y1,x2,y2,p) => ({x:toward(x1,x2)(p),y:toward(y1,y2)(p)});
 
-/* Expects an XY object, an angle, and a distance. Returns an XY object */
-const getSatelliteXY = (pos,angle,distance) => {
-   x:getSatellite(pos.x,angle,distance,true),
-   y:getSatellite(pos.y,angle,distance,false)
-};
+/* Expects an X and a Y, an angle, and a distance. Returns an XY object */
+const getSatelliteXY = (x,y,a,d) => ({x:x+Math.cos(a)*d,y:y+Math.sin(a)*d});
 
 /* check if two number ranges overlap */
 const overlap = (a0,a1,b0,b1) => Math.min(a0,a1) <= Math.max(b0,b1) && Math.min(b0,b1) <= Math.max(a0,a1);
