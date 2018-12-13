@@ -6,6 +6,7 @@
 */
 
 
+
 /* MATHS.JS */
 /*---------------------- Math Helper Functions -----------------------------*/
 
@@ -94,10 +95,10 @@ const roundTo = (n,x) => {
 const pointDistance = (x1,y1,x2,y2) => Math.sqrt((x1-x2)**2 + (y1-y2)**2);
 
 /* Return a point between one point and another: Position1, Position2, Percentage */
-const positionToward = (x1,y1,x2,y2,p) => ({x:toward(x1,x2)(p),y:toward(y1,y2)(p)});
+const positionToward = (x1,y1,x2,y2,p) => xy(toward(x1,x2)(p),toward(y1,y2)(p));
 
 /* Expects an X and a Y, an angle, and a distance. Returns an XY object */
-const getSatelliteXY = (x,y,a,d) => ({x:x+Math.cos(a)*d,y:y+Math.sin(a)*d});
+const getSatelliteXY = (x,y,a,d) => xy(x+Math.cos(a)*d,y+Math.sin(a)*d);
 
 /* check if two number ranges overlap */
 const overlap = (a0,a1,b0,b1) => Math.min(a0,a1) <= Math.max(b0,b1) && Math.min(b0,b1) <= Math.max(a0,a1);
@@ -132,4 +133,3 @@ const rectInRect = (x0,y0,x1,y1,x2,y2,x3,y3) => pointInRect(x0,y0,x2,y2,x3,y3) &
 
 /* detect if a circle is touching another circle. Use 0 for r1 if a point */
 const detectCircleCollission = (x1,y1,r1,x2,y2,r2) => pointDistance(x1,y1,x2,y2) < (r1 + r2);
-
