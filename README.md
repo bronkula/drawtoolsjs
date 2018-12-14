@@ -56,7 +56,7 @@ Ok, so we've included the drawtools library. You see that right? Don't mess up t
 
 
 ## Event Tools JS
-This is ok, but now let's use the Event Tools to draw a circle wherever we click on the canvas. Also, let's include some jquery, because it sure helps with event delegation and element selection... And also because the Event Tools require it...
+This is ok, but now let's use the Event Tools to draw a circle wherever we click on the canvas. Also, let's include some jquery, because it sure helps with event delegation and element selection.
 
 ```html
 <canvas width="400" height="400"></canvas>
