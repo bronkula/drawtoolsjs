@@ -98,7 +98,7 @@ Then we'll start a `setInterval` when the mouse is pressed. Now every 10 millise
 	  .on("mousedown touchstart",function(e){
 	    drawing = setInterval(function(){
 	      num+=2;
-	      var pos = getSatelliteXY(mouse,num%360,40);
+	      var pos = getSatelliteXY(mouse.x,mouse.y,num%360,40);
 	      drawCircle(ctx,pos.x,pos.y,2,{fillStyle:"blue"});
 	    },10);
 	    mouse = getEventXY(e);
