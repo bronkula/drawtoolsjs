@@ -1,4 +1,5 @@
 /*
+ * https://github.com/bronkula/drawtoolsjs/edit/master/maths.js
  * Maths.js from the DrawTools.js library
  * Creator: Hamilton Cline
  * Email: hamdiggy@gmail.com
@@ -25,6 +26,8 @@ const angleFromSides = (a,b,c) => Math.acos((c*c+a*a-b*b)/(2*c*a));
 /* A random number between n and x */
 const rand = (n,x) => Math.round(Math.random()*(x-n))+n;
 
+const circumference = r => Math.PI*2*r;
+
 
 
 /* Returns an x y object from x y values */
@@ -36,12 +39,14 @@ const vxs = (x0,y0,x1,y1) => (x0*y1) - (x1*y0);
 /* If p(osition) is outside of n or x, return a reversed s(peed) */
 const bounce = (p,s,n,x) => p>=x||p<=n?-s:s;
 
-const bounceXY = (a,y) => y?-a:a-(Math.abs(a)<90?90:-90);
+/* Bounce angle a off of a vertical or horizontal wall */
+const bounceX = a => Math.sign(a)*trueHalfRadian(-signHalfRadian(Math.abs(signRadian(a))));
+const bounceY = a => -signRadian(a);
 
 /* This function takes two objects, and replaces or adds any values in object 1 with the values of object 2 */
 const overRide = (o1,o2) => !o2?o1:Object.assign(o1,o2);
 
-/* This function is basic ratio math. returns a number in omax at a similar ratio to nmin in nmax */
+/* This function is basic ratio math. curries a ratio and then multiplies that by another number */
 const ratio = (min,max) => n => n*min/max;
 
 /* Nudge a number a certain percentage of a distance using a starting offset */
@@ -53,12 +58,14 @@ const clamp = (min,max) => n => n>max?max:n<min?min:n;
 /* Given a curried max value, attempts to bring negative numbers to positive range of loop */
 const trueNumber = max => n => n<0?n+max:n;
    const trueRadian = trueNumber(Math.PI*2);
-   const trueAngle = trueNumber(360);
+   const trueHalfRadian = trueNumber(Math.PI);
+   const trueDegree = trueNumber(360);
 
 /* Given a curried max value, attempts to wrap a number over half into a negative number of loop */
 const signNumber = max => n => n>max*0.5?n%max-max:n;
    const signRadian = signNumber(Math.PI*2);
-   const signAngle = signNumber(360);
+   const signHalfRadian = signNumber(Math.PI);
+   const signDegree = signNumber(360);
 
 /* This function returns an arbitrary positive number looped inside an arbitrary positive number range */
 const within = (min,max) => n => trueNumber(max-min)((n-min)%(max-min))+min;
@@ -73,6 +80,7 @@ example:
 toward(10,20)(0.5) > 15
 */
 const toward = (min,max,o=false) => n => n*(max-min)+(o||min);
+
 /* This function maps a number from one arbitrary range onto another arbitrary range.
 example:
 mapRange(5,0,10,0,360) > 180*/
@@ -92,7 +100,7 @@ const roundTo = (n,x) => {
 
 /*------------------------ Positional Functions ------------------------------------*/
 /* The distance between two points */
-const pointDistance = (x1,y1,x2,y2) => Math.sqrt((x1-x2)**2 + (y1-y2)**2);
+const pointDistance = (x1,y1,x2,y2) => Math.hypot(x1-x2,y1-y2);
 
 /* Return a point between one point and another: Position1, Position2, Percentage */
 const positionToward = (x1,y1,x2,y2,p) => xy(toward(x1,x2)(p),toward(y1,y2)(p));
@@ -101,7 +109,7 @@ const positionToward = (x1,y1,x2,y2,p) => xy(toward(x1,x2)(p),toward(y1,y2)(p));
 const getSatelliteXY = (x,y,a,d) => xy(x+Math.cos(a)*d,y+Math.sin(a)*d);
 
 /* check if two number ranges overlap */
-const overlap = (a0,a1,b0,b1) => Math.min(a0,a1) <= Math.max(b0,b1) && Math.min(b0,b1) <= Math.max(a0,a1);
+const overlap = (a1,a2,b1,b2) => Math.min(a1,a2) <= Math.max(b1,b2) && Math.min(b1,b2) <= Math.max(a1,a2);
 
 /* check if two boxes overlap */
 const intersectBox = (x0,y0,x1,y1,x2,y2,x3,y3) => overlap(x0,x1,x2,x3) && overlap(y0,y1,y2,y3);
@@ -121,7 +129,9 @@ const isIntersect = (x0,y0,x1,y1,x2,y2,x3,y3) => IntersectBox(x0,y0,x1,y1, x2,y2
    && Math.abs(PointSide(x0,y0,x2,y2,x3,y3) + PointSide(x1,y1,x2,y2,x3,y3)) != 2;
 
 /* Detect if a point is in a rectangle */
-const pointInRect = (px,py,x1,y1,x2,y2) => px >= x1 && px <= x2 && py >= y1 && py <= y2;
+const pointInRect = (x1,y1,x2,y2) => (px,py) => px>=x1&&px<=x2&&py>=y1&&py<=y2;
+
+const inRange = (a,b) => n => a<=n&&b>=n;
 
 const pointInArc = (px,py,ax,ay,ir,or,as,ae) => {
    var a = angleFromPoints(px,py,ax,ay);
@@ -132,4 +142,4 @@ const pointInArc = (px,py,ax,ay,ir,or,as,ae) => {
 const rectInRect = (x0,y0,x1,y1,x2,y2,x3,y3) => pointInRect(x0,y0,x2,y2,x3,y3) && pointInRect(x1,y1,x2,y2,x3,y3);
 
 /* detect if a circle is touching another circle. Use 0 for r1 if a point */
-const detectCircleCollission = (x1,y1,r1,x2,y2,r2) => pointDistance(x1,y1,x2,y2) < (r1 + r2);
+const circleCollission = (x1,y1,r1,x2,y2,r2) => pointDistance(x1,y1,x2,y2) < (r1 + r2);
