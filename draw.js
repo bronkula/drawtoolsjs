@@ -174,7 +174,7 @@ const drawableImage = url => {
   i.onload = ()=> loaded=true;
   i.src = url;
 
-  const drawI = function(ctx,x,y,w,h){
+  const drawI = (ctx,x,y,w,h) => {
 //     console.log(i)
     if(!loaded) setTimeout(drawI,10);
     else {
